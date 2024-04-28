@@ -1,0 +1,21 @@
+.header-common{
+  display: flex;
+  flex-direction: column;
+  padding: 0px 18px;
+  .favor-icon{
+    width: 80px;
+    height: 80px;
+    margin-left: -20px;
+  }
+  .title-h{
+    font-size: 24px;
+    font-weight: bold;
+    color: white;
+    font-family: Tomorrow;
+  }
+  .des{
+    font-family: Tomorrow;
+    font-size: 24px;
+    color: #C9C9C9;
+  }
+}

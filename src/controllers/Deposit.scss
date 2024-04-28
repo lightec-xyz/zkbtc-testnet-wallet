@@ -1,0 +1,892 @@
+.ctrl-main{
+  display: flex;
+  flex-direction: column;
+  width: 380px;
+  height: 614px;
+  background-color: #010201;
+  background-size: cover;
+  background-image: url("../assets/normal_bg.png");
+  padding: 18px;
+  input[type='number']::-webkit-inner-spin-button,
+  input[type='number']::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  input[type='number'] {
+    -moz-appearance: textfield;
+  }
+  .deposit-con{
+    display: flex;
+    flex-direction: column;
+    .header{
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+      .info-con{
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        .avatar{
+          width: 40px;
+          height: 40px;
+          border-radius: 50%;
+        }
+        .address-con{
+          margin-left: 5px;
+          display: flex;
+          flex-direction: column;
+          .name-con{
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            .name{
+              color: white;
+              font-size: 14px;
+              font-family: Tomorrow;
+              font-weight: 400;
+            }
+            .switch-icon{
+              width: 12px;
+              height: 12px;
+              margin-left: 5px;
+            }
+          }
+          .address{
+            color: white;
+            font-family: Tomorrow;
+            font-weight: 500;
+            font-size: 16px;
+            max-width: 180px;
+            white-space: nowrap;
+            overflow: hidden;
+          }
+        }
+      }
+      .control-con{
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        .icon{
+          width: 32px;
+          height: 32px;
+        }
+        .switch-net{
+          display: flex;
+          flex-direction: row;
+          align-items: center;
+          height: 32px;
+          padding-left: 10px;
+          padding-right: 10px;
+          background: #283746;
+          border-radius: 16px;
+          .net-icon{
+            width: 23.4px;
+            height: 23.4px;
+          }
+          .down-arrow{
+            width: 11px;
+            height: 11px;
+            margin-left: 5px;
+          }
+        }
+      }
+    }
+    .balance-con{
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      margin-top: 12px;
+      .balance{
+        color: white;
+        font-family: Tomorrow;
+        font-size: 24px;
+        font-weight: bold;
+      }
+      .tips{
+        color: white;
+        font-family: Tomorrow;
+        font-size: 16px;
+        font-weight: 400;
+        margin-left: 5px;
+      }
+      .facut{
+        width: 24px;
+        height: 24px;
+        margin-left: 5px;
+      }
+    }
+    .unconfirmed-balance-con{
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      .balance{
+        color: #c0c0c0;
+        font-family: Tomorrow;
+        font-size: 18px;
+        font-weight: bold;
+      }
+      .unit{
+        color: #c0c0c0;
+        font-family: Tomorrow;
+        font-size: 14px;
+        font-weight: 400;
+        margin-left: 5px;
+      }
+      .tips{
+        color: #B05F37;
+        font-family: Tomorrow;
+        font-size: 16px;
+        font-weight: 400;
+        margin-left: 5px;
+      }
+    }
+    .switch-con{
+      margin: 30px auto 16px auto;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      width: 80%;
+      .deposit{
+        color: white;
+        background-color: #2051F4;
+        border-radius: 20px;
+        text-align: center;
+        font-family: Tomorrow;
+        font-weight: 600;
+        font-size: 18px;
+        height: 40px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        width: 50%;
+        z-index: 100;
+        transition: filter 0.3s ease; /* 平滑过渡效果 */
+      }
+      .deposit:hover {
+        filter: brightness(130%); /* 鼠标滑过时变亮10% */
+      }
+      .redeem{
+        color: white;
+        background: #131937;
+        border-radius: 20px;
+        text-align: center;
+        margin-left: -30px;
+        font-family: Tomorrow;
+        font-weight: 600;
+        font-size: 18px;
+        height: 40px;
+        width: 50%;
+        padding-left: 10px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        transition: filter 0.3s ease; /* 平滑过渡效果 */
+      }
+      .redeem:hover {
+        filter: brightness(130%); /* 鼠标滑过时变亮10% */
+      }
+    }
+    .info-con{
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      .title{
+        color: white;
+        font-family: Tomorrow;
+        font-size: 16px;
+        font-weight: 500;
+      }
+      .amount-con{
+        margin-top: 10px;
+        border: 1px solid white;
+        border-radius: 8px;
+        height: 42px;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        background-color: #010201;
+        .input-filed{
+          line-height: 30px;
+          margin: auto 10px;
+          color: white;
+          font-family: Tomorrow;
+          font-size: 16px;
+          font-weight: 600;
+          width: 80%;
+          border-color: transparent;
+          background: transparent;
+        }
+        .input-filed:focus{
+          outline: none;
+          border: none;
+        }
+        .max-btn{
+          height: 32px;
+          margin: auto 5px;
+          background: #2051F4;
+          width: 54px;
+          color: white;
+          font-family: Tomorrow;
+          font-size: 12px;
+          font-weight: bold;
+          text-align: center;
+          border-radius: 7px;
+          display: flex;
+          align-items: center;
+          flex-direction: row;
+          justify-content: center;
+        }
+      }
+      .address-input{
+        margin-top: 10px;
+        border: 1px solid white;
+        border-radius: 8px;
+        height: 42px;
+        padding-left: 10px;
+        padding-right: 10px;
+        color: white;
+        font-family: Tomorrow;
+        font-size: 16px;
+        font-weight: 600;
+        background: #010201;
+      }
+      .address-input:focus{
+        outline: none;
+      }
+
+      .estimate-con{
+        display: flex;
+        flex-direction: column;
+        margin-top: 12px;
+        .tips{
+          color: white;
+          font-size: 14px;
+          font-family: Tomorrow;
+          font-weight: 400;
+        }
+        .val-con{
+          display: flex;
+          flex-direction: row;
+          align-items: center;
+          .value{
+            color: white;
+            font-size: 14px;
+            font-family: Tomorrow;
+            font-weight: bold;
+          }
+          .tips{
+            color: white;
+            font-size: 14px;
+            font-family: Tomorrow;
+            font-weight: 400;
+          }
+        }
+      }
+
+      .confirm-con{
+        display: block;
+        flex-direction: column;
+        align-items: center;
+        margin-top: 30px;
+        .estimate-miner-fee{
+          display: flex;
+          flex-direction: row;
+          margin-left: auto;
+          margin-right: auto;
+          text-align: center;
+          .des{
+            color: white;
+            font-size: 14px;
+            font-weight: 400;
+            font-family: Tomorrow;
+            margin-left: auto;
+          }
+          .value{
+            color: white;
+            font-size: 14px;
+            font-family: Tomorrow;
+            font-weight: bold;
+            margin-right: auto;
+          }
+        }
+
+        .fee-detail{
+          display: flex;
+          flex-direction: row;
+          align-items: center;
+          margin-left: auto;
+          margin-right: auto;
+          margin-top: 20px;
+          .tips{
+            color: white;
+            font-size: 14px;
+            font-family: Tomorrow;
+            font-weight: 600;
+          }
+          .icon{
+            width: 14px;
+            height: 14px;
+          }
+        }
+
+        .confirm-btn-disable{
+          color: white;
+          user-select: none;
+          background: #131937;
+          border-radius: 22px;
+          text-align: center;
+          font-family: Tomorrow;
+          font-weight: 600;
+          font-size: 18px;
+          height: 42px;
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+        }
+
+        .confirm-btn{
+          color: white;
+          user-select: none;
+          background: #2051F4;
+          border-radius: 22px;
+          text-align: center;
+          font-family: Tomorrow;
+          font-weight: 600;
+          font-size: 18px;
+          height: 42px;
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+        }
+      }
+
+      .history-con{
+        background: #6C9BD4;
+        border-radius: 8px;
+        height: 42px;
+        margin-top: 40px;
+        .inner-con{
+          display: flex;
+          flex-direction: row;
+          align-items: center;
+          justify-content: space-between;
+          background: white;
+          border-radius: 8px;
+          margin-left: 6px;
+          height: 42px;
+          padding-left: 10px;
+          padding-right: 10px;
+          .title{
+            color: #0E0D0D;
+            font-size: 18px;
+            font-family: Tomorrow;
+            font-weight: 500;
+          }
+          .icon{
+            width: 12px;
+            height: 20px;
+          }
+        }
+      }
+    }
+  }
+  .redeem-con{
+    display: flex;
+    flex-direction: column;
+    .header{
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+      .info-con{
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        .avatar{
+          width: 40px;
+          height: 40px;
+          border-radius: 50%;
+        }
+        .address-con{
+          margin-left: 5px;
+          display: flex;
+          flex-direction: column;
+          .name-con{
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            .name{
+              color: white;
+              font-size: 14px;
+              font-family: Tomorrow;
+              font-weight: 400;
+            }
+            .switch-icon{
+              width: 12px;
+              height: 12px;
+              margin-left: 5px;
+            }
+          }
+          .address{
+            color: white;
+            font-family: Tomorrow;
+            font-weight: 500;
+            font-size: 16px;
+            width: 180px;
+            white-space: nowrap;
+            overflow: hidden;
+          }
+        }
+      }
+      .control-con{
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        .icon{
+          width: 32px;
+          height: 32px;
+        }
+        .switch-net{
+          display: flex;
+          flex-direction: row;
+          align-items: center;
+          height: 32px;
+          padding-left: 10px;
+          padding-right: 10px;
+          background: #283746;
+          border-radius: 16px;
+          .net-icon{
+            width: 23.4px;
+            height: 23.4px;
+          }
+          .down-arrow{
+            width: 11px;
+            height: 11px;
+            margin-left: 5px;
+          }
+        }
+      }
+    }
+    .balance-con{
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      margin-top: 12px;
+      .balance{
+        color: white;
+        font-family: Tomorrow;
+        font-size: 24px;
+        font-weight: bold;
+      }
+      .tips{
+        color: white;
+        font-family: Tomorrow;
+        font-size: 16px;
+        font-weight: 400;
+        margin-left: 5px;
+      }
+      .facut{
+        width: 24px;
+        height: 24px;
+        margin-left: 5px;
+      }
+    }
+    .eth-con{
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      .balance{
+        color: #c0c0c0;
+        font-family: Tomorrow;
+        font-size: 18px;
+        font-weight: bold;
+      }
+      .tips{
+        color: #c0c0c0;
+        font-family: Tomorrow;
+        font-size: 14px;
+        font-weight: 400;
+        margin-left: 5px;
+      }
+      .facut{
+        width: 18px;
+        height: 18px;
+        margin-left: 5px;
+      }
+    }
+    .balance-container{
+      margin-top: 20px;
+      background: #1a1a1a9a;
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      padding: 20px;
+      border-radius: 12px;
+      border: #C5C5C5 1px solid;
+      box-shadow: 0px 0px 20px 0px #FFFFFF;
+      .zkBTC-con{
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin: auto;
+        .unit{
+          color: #c0c0c0;
+          font-size: 18px;
+          font-weight: 400;
+        }
+        .num{
+          color: white;
+          font-size: 20px;
+          font-weight: 600;
+          font-family: Tomorrow;
+        }
+        .num-con{
+          display: flex;
+          flex-direction: row;
+          align-items: center;
+          .num{
+            color: white;
+            font-size: 20px;
+            font-weight: 600;
+            font-family: Tomorrow;
+          }
+          .icon{
+            width: 18px;
+            height: 18px;
+            margin-left: 5px;
+          }
+        }
+      }
+    }
+    .switch-con{
+      margin: 30px auto 16px auto;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      width: 80%;
+      .deposit{
+        color: white;
+        user-select: none;
+        background: #131937;
+        border-radius: 20px;
+        text-align: center;
+        font-family: Tomorrow;
+        font-weight: 600;
+        font-size: 18px;
+        height: 40px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        width: 50%;
+        z-index: 100;
+        transition: filter 0.3s ease;
+      }
+
+      .deposit:hover{
+        filter: brightness(130%);
+      }
+      .redeem{
+        color: white;
+        background: #2051F4;
+        border-radius: 20px;
+        user-select: none;
+        text-align: center;
+        margin-left: -30px;
+        font-family: Tomorrow;
+        font-weight: 600;
+        font-size: 18px;
+        height: 40px;
+        width: 50%;
+        padding-left: 10px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        transition: filter 0.3s ease;
+      }
+      .redeem:hover{
+        filter: brightness(130%);
+      }
+    }
+    .info-con{
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      .title{
+        color: white;
+        font-family: Tomorrow;
+        font-size: 16px;
+        font-weight: 500;
+      }
+      .amount-con{
+        margin-top: 10px;
+        border: 1px solid white;
+        border-radius: 8px;
+        height: 42px;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        background-color: #010201;
+        .input-filed{
+          line-height: 30px;
+          margin: auto 10px;
+          color: white;
+          font-family: Tomorrow;
+          font-size: 16px;
+          font-weight: 600;
+          width: 80%;
+          border-color: transparent;
+          background: transparent;
+        }
+        .input-filed:focus{
+          outline: none;
+          border: none;
+        }
+        .max-btn{
+          height: 32px;
+          margin: auto 5px;
+          background: #2051F4;
+          width: 54px;
+          color: white;
+          font-family: Tomorrow;
+          font-size: 12px;
+          font-weight: bold;
+          text-align: center;
+          border-radius: 7px;
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+        }
+      }
+      .address-input{
+        margin-top: 10px;
+        border: 1px solid white;
+        border-radius: 8px;
+        height: 42px;
+        padding-left: 10px;
+        padding-right: 10px;
+        color: white;
+        font-family: Tomorrow;
+        font-size: 16px;
+        font-weight: 600;
+        background: #010201;
+      }
+      .address-input:focus{
+        outline: none;
+      }
+
+      .estimate-con{
+        display: flex;
+        flex-direction: column;
+        margin-top: 12px;
+        .tips{
+          color: white;
+          font-size: 14px;
+          font-family: Tomorrow;
+          font-weight: 400;
+        }
+        .val-con{
+          display: flex;
+          flex-direction: row;
+          align-items: center;
+          .value{
+            color: white;
+            font-size: 14px;
+            font-family: Tomorrow;
+            font-weight: bold;
+          }
+          .tips{
+            color: white;
+            font-size: 14px;
+            font-family: Tomorrow;
+            font-weight: 400;
+          }
+        }
+      }
+
+      .fee-detail{
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        margin-left: auto;
+        margin-right: auto;
+        margin-top: 20px;
+        .tips{
+          color: white;
+          font-size: 14px;
+          font-family: Tomorrow;
+          font-weight: 600;
+        }
+        .icon{
+          width: 14px;
+          height: 14px;
+        }
+      }
+
+      .confirm-btn-disable{
+        color: white;
+        user-select: none;
+        background: #131937;
+        border-radius: 22px;
+        text-align: center;
+        font-family: Tomorrow;
+        font-weight: 600;
+        font-size: 18px;
+        height: 42px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        margin-top: 30px;
+      }
+
+      .confirm-btn{
+        color: white;
+        user-select: none;
+        background: #2051F4;
+        border-radius: 22px;
+        text-align: center;
+        font-family: Tomorrow;
+        font-weight: 600;
+        font-size: 18px;
+        height: 42px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        margin-top:30px;
+      }
+
+      .history-con{
+        background: #6C9BD4;
+        border-radius: 8px;
+        height: 42px;
+        margin-top: 40px;
+        .inner-con{
+          display: flex;
+          flex-direction: row;
+          align-items: center;
+          justify-content: space-between;
+          background: white;
+          border-radius: 8px;
+          margin-left: 6px;
+          height: 42px;
+          padding-left: 10px;
+          padding-right: 10px;
+          .title{
+            color: #0E0D0D;
+            font-size: 18px;
+            font-family: Tomorrow;
+            font-weight: 500;
+          }
+          .icon{
+            width: 12px;
+            height: 20px;
+          }
+        }
+      }
+    }
+  }
+  .menu{
+    position: absolute;
+    top: 60px;
+    right: 10px;
+    z-index: 999;
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+    background: #39403899;
+    border-radius: 8px;
+
+    .item{
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      .icon{
+        width: 22px;
+        height: 22px;
+      }
+      .text{
+        margin-left: 10px;
+        color: white;
+        font-size: 16px;
+        font-weight: 600;
+        font-family: Tomorrow;
+        max-width: 300px;
+      }
+      .status-icon{
+        margin-left: 40px;
+        width: 14px;
+        height: 14px;
+      }
+    }
+    .line{
+      width: 100%;
+      height: 1px;
+      background: #6a6a6a;
+      margin-top: 10px;
+      margin-bottom: 10px;
+    }
+  }
+  .wallet-menu{
+    position: absolute;
+    top: 60px;
+    left: 10px;
+    z-index: 999;
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+    background: #39403899;
+    border-radius: 8px;
+    max-width: 350px;
+
+    .item{
+      display: flex;
+      flex-direction:column;
+      .wallet-name-con{
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        .title-con{
+          display: flex;
+          flex-direction: row;
+          align-items: center;
+          .icon{
+            width: 22px;
+            height: 22px;
+          }
+          .title{
+            margin-left: 5px;
+            color: #ffffff;
+            font-size: 14px;
+            font-weight: 400;
+          }
+        }
+        .status-icon{
+          width: 14px;
+          height: 14px;
+          margin-top: 5px;
+        }
+      }
+      .text{
+        margin-top: 3px;
+        color: white;
+        font-size: 16px;
+        font-weight: 600;
+        font-family: Tomorrow;
+        text-overflow: ellipsis;
+        overflow-x: hidden;
+      }
+
+    }
+    .line{
+      width: 100%;
+      height: 1px;
+      background: #6a6a6a;
+      margin-top: 10px;
+      margin-bottom: 10px;
+    }
+  }
+}

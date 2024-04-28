@@ -1,0 +1,65 @@
+.pr-main{
+  display: flex;
+  flex-direction: column;
+  background-color: #010201;
+  background-size: contain;
+  background-image: url("../assets/normal_bg.png");
+  width: 380px;
+  height: 614px;
+  .pr-con{
+    display: flex;
+    flex-direction: column;
+    padding: 0px 18px;
+    margin-top: 50px;
+    .tips{
+      font-family: Tomorrow;
+      font-size: 18px;
+      font-weight: 500;
+      color: white;
+    }
+    .pr-input{
+      margin-top: 10px;
+      background: transparent;
+      padding: 10px;
+      border-radius: 8px;
+      font-family: Tomorrow;
+      font-size: 16px;
+      height: 60px;
+      font-weight: 500;
+      color: white;
+      border: 1px solid white;
+      resize: none;
+    }
+    .pr-input:focus{
+      outline: none;
+    }
+  }
+  .pr-btn-disable{
+    margin-top: 40px;
+    color: white;
+    background: #131937;
+    border-radius: 22px;
+    text-align: center;
+    font-family: Tomorrow;
+    font-weight: 600;
+    font-size: 18px;
+    height: 42px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  .pr-btn-enable{
+    margin-top: 40px;
+    color: white;
+    background: #2051F4;
+    border-radius: 22px;
+    text-align: center;
+    font-family: Tomorrow;
+    font-weight: 600;
+    font-size: 18px;
+    height: 42px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+}

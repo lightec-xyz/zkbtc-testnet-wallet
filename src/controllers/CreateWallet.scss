@@ -1,0 +1,55 @@
+.create-main{
+  display: flex;
+  flex-direction: column;
+  width: 380px;
+  height: 614px;
+  background-color: #010201;
+  background-size: contain;
+  background-image: url("../assets/normal_bg.png");
+  .tip-con{
+    display: flex;
+    flex-direction: column;
+    margin-top: 30px;
+    padding: 0px 18px;
+    .title{
+      color: white;
+      font-family: Tomorrow;
+      font-size: 18px;
+      font-weight: 500;
+      margin-bottom: 12px;
+    }
+    .warning-item{
+      display: flex;
+      flex-direction: row;
+      align-items: start;
+      margin-bottom: 16px;
+      .icon{
+        width: 16px;
+        height: 16px;
+      }
+      .text{
+        margin-left: 8px;
+        font-family: Tomorrow;
+        font-size: 14px;
+        font-weight: 400;
+        word-wrap: break-word;
+        color: white;
+      }
+    }
+
+    .unlock-btn{
+      margin-top: 25px;
+      color: white;
+      background: #2051F4;
+      border-radius: 22px;
+      text-align: center;
+      font-family: Tomorrow;
+      font-weight: 600;
+      font-size: 18px;
+      height: 42px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+  }
+}

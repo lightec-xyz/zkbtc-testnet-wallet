@@ -1,0 +1,62 @@
+.unlock-main{
+  display: flex;
+  flex-direction: column;
+  width: 380px;
+  height: 614px;
+  background-color: #010201;
+  background-size: contain;
+  background-image: url("../assets/normal_bg.png");
+  .password-con{
+    display: flex;
+    flex-direction: column;
+    padding:0px 18px;
+
+    margin-top: 100px;
+    .tips{
+      font-family: Tomorrow;
+      font-size: 18px;
+      font-weight: 500;
+      color: white;
+    }
+    .input-tx{
+      margin-top: 8px;
+      color: white;
+      font-size: 18px;
+      font-weight: 600;
+      font-family: Tomorrow;
+      padding: 10px 12px;
+      border: 1px white solid;
+      border-radius: 8px;
+      background: #010201;
+    }
+    .unlock-btn-disable{
+      margin-top: 40px;
+      color: white;
+      background: #131937;
+      border-radius: 22px;
+      text-align: center;
+      font-family: Tomorrow;
+      font-weight: 600;
+      font-size: 18px;
+      height: 42px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .unlock-btn{
+      margin-top: 40px;
+      color: white;
+      background: #2051F4;
+      border-radius: 22px;
+      text-align: center;
+      font-family: Tomorrow;
+      font-weight: 600;
+      font-size: 18px;
+      height: 42px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+  }
+}

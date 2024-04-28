@@ -1,0 +1,54 @@
+.page {
+  opacity: 0;
+  transform: translateX(100%);
+  transition: opacity 500ms, transform 500ms;
+}
+
+.page-transition-enter {
+  opacity: 0;
+  transform: translateX(100%);
+}
+
+.page-transition-enter-active {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.page-transition-exit {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.page-transition-exit-active {
+  opacity: 0;
+  transform: translateX(-100%);
+}
+
+/* 定义一个通用的hover效果类 */
+.hover-brighten {
+  user-select: none;
+  transition:transform 0.3s ease, filter 0.3s ease; /* 平滑过渡效果 */
+}
+
+.hover-brighten:hover {
+  transform: scale(1.05);
+  filter: brightness(130%); /* 鼠标滑过时变亮 */
+}
+
+.hover-brighten-large {
+  user-select: none;
+  transition:transform 0.3s ease, filter 0.3s ease; /* 平滑过渡效果 */
+}
+
+.hover-brighten-large:hover {
+  transform: scale(1.2);
+  filter: brightness(130%); /* 鼠标滑过时变亮 */
+}
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  transition: background-color 5000s ease-in-out 0s;
+  -webkit-text-fill-color: #FFFFFF !important;
+}

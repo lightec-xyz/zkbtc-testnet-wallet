@@ -1,0 +1,72 @@
+.import-main{
+  display: flex;
+  flex-direction: column;
+  width: 380px;
+  height: 614px;
+  background-color: #010201;
+  background-size: contain;
+  background-image: url("../assets/normal_bg.png");
+  .import-wal{
+    display: flex;
+    flex-direction: column;
+    padding: 0px 18px;
+    margin-top: 60px;
+    .import-con{
+      display: flex;
+      flex-direction: column;
+      .tips{
+        font-family: Tomorrow;
+        font-weight: 500;
+        color: white;
+      }
+      .waring-con{
+        color: darkorange;
+        font-weight: 400;
+        font-family: Tomorrow;
+        font-size: 12px;
+        margin-top: 5px;
+        .icon{
+          width: 12px;
+          height: 12px;
+          margin-right: 3px;
+        }
+        .lab{
+          color: darkorange;
+          font-weight: 400;
+          font-family: Tomorrow;
+          font-size: 12px;
+        }
+      }
+      .import-item{
+        background: #2051F4;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        border-radius: 8px;
+        height: 42px;
+        margin-top: 8px;
+        .inner-con{
+          margin-left: 6px;
+          display: flex;
+          flex-direction: row;
+          align-items: center;
+          justify-content: space-between;
+          background: white;
+          border-radius: 8px;
+          height: 42px;
+          width: 100%;
+          padding: 0 10px;
+          .title{
+            font-family: Tomorrow;
+            font-weight: 600;
+            color: #010102;
+          }
+          .icon{
+            width: 12px;
+            height: 20px;
+          }
+        }
+      }
+    }
+  }
+}

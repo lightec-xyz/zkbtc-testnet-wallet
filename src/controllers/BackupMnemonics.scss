@@ -1,0 +1,98 @@
+.backup-main{
+  display: flex;
+  flex-direction: column;
+  width: 380px;
+  height: 614px;
+  background-color: #010201;
+  background-size: contain;
+  background-image: url("../assets/normal_bg.png");
+  .backup-con{
+    display: flex;
+    flex-direction: column;
+    margin-top: 60px;
+    padding: 0px 18px;
+    .title{
+      color: white;
+      font-size: 18px;
+      font-family: Tomorrow;
+      font-weight: 600;
+    }
+    .mnemonics-con{
+      padding: 10px;
+      background: #191821;
+      border-radius: 8px;
+      padding: 10px;
+      margin-top: 12px;
+      .mnemonics-text{
+        color: #80DF8A;
+        font-size: 16px;
+        font-family: Tomorrow;
+        font-weight: 400;
+      }
+    }
+
+    .copy-con{
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      margin-left: auto;
+      margin-right: auto;
+      margin-top: 12px;
+      .tips{
+        color: #2051F4;
+        font-weight: bold;
+        font-family: Tomorrow;
+        font-size: 14px;
+      }
+      .icon{
+        margin-left: 5px;
+        width: 16px;
+        height: 16px;
+      }
+    }
+
+    .btn-con{
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-top: 60px;
+      .tips{
+        color: white;
+        font-size: 16px;
+        font-family: Tomorrow;
+        font-weight: 500;
+      }
+      .unlock-btn-disable{
+        width: 100%;
+        margin-top: 12px;
+        color: white;
+        background: #131937;
+        border-radius: 22px;
+        text-align: center;
+        font-family: Tomorrow;
+        font-weight: 600;
+        font-size: 18px;
+        height: 42px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+      }
+
+      .unlock-btn{
+        width: 100%;
+        margin-top: 12px;
+        color: white;
+        background: #2051F4;
+        border-radius: 22px;
+        text-align: center;
+        font-family: Tomorrow;
+        font-weight: 600;
+        font-size: 18px;
+        height: 42px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+      }
+    }
+  }
+}

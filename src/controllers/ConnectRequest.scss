@@ -1,0 +1,125 @@
+.connect-main{
+  display: flex;
+  flex-direction: column;
+  width: 380px;
+  height: 614px;
+  background-color: #010201;
+  background-size: contain;
+  background-image: url("../assets/normal_bg.png");
+  .header{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding-left: 10px;
+    .icon{
+      width: 33px;
+      height: 33px;
+    }
+    .name{
+      font-size: 18px;
+      color: white;
+      font-family: Tomorrow;
+      font-weight: 600;
+    }
+  }
+  .connect-con{
+    display: flex;
+    flex-direction: column;
+    margin-top: 30px;
+    padding: 0px 18px;
+    .title{
+      color: white;
+      font-size: 20px;
+      font-family: Tomorrow;
+      font-weight: 500;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .info-con{
+      display: flex;
+      flex-direction: column;
+      background: #232423;
+      border-radius: 8px;
+      padding: 18px 12px;
+      margin-top: 10px;
+      .item-con{
+        display: flex;
+        flex-direction: column;
+        margin-top: 10px;
+        .tips{
+          color: white;
+          font-family: Tomorrow;
+          font-size: 20px;
+          font-weight: 400;
+        }
+        .divider-line{
+          background: #383938;
+          height: 1px;
+          width: 300px;
+          margin-top: 2px;
+          margin-bottom: 2px;
+        }
+        .value-con{
+          display: flex;
+          flex-direction: row;
+          align-items: center;
+          .val-icon{
+            width: 33px;
+            height: 33px;
+            margin-left: -5px;
+          }
+          .value{
+            color: #2051F4;
+            font-size: 18px;
+            font-weight: 600;
+            text-overflow: ellipsis;
+            overflow-x: hidden;
+          }
+        }
+        .number{
+          color: white;
+          font-family: Tomorrow;
+          font-weight: 800;
+          font-size: 18px;
+        }
+      }
+    }
+    .confirm-btns-con{
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      margin-top: 40px;
+      width: 100%;
+      justify-content: space-between;
+      .cancel{
+        color: white;
+        background: #131937;
+        border-radius: 22px;
+        text-align: center;
+        font-family: Tomorrow;
+        font-weight: 600;
+        font-size: 18px;
+        height: 42px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        width: 46%;
+      }
+
+      .confirm{
+        color: white;
+        background: #2051F4;
+        border-radius: 22px;
+        text-align: center;
+        font-family: Tomorrow;
+        font-weight: 600;
+        font-size: 18px;
+        height: 42px;
+        width: 46%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+      }
+    }
+  }
+}
