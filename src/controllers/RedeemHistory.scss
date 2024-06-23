@@ -1,0 +1,339 @@
+.redeem-his{
+  display: flex;
+  flex-direction: column;
+  width: 380px;
+  height: 614px;
+  padding: 16px;
+  background-color: #32364a;
+  background-size: 100% 100%;
+  background-image: url("../assets/normal_bg.png");
+  .header-con{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    .back-icon{
+      width: 18px;
+      height: 18px;
+      object-fit: contain;
+    }
+    .title{
+      color: white;
+      font-size: 18px;
+      font-weight: 700;
+      font-family: Tomorrow;
+    }
+  }
+  .title-con{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 30px;
+    .icon{
+      width: 30px;
+      height: 30px;
+    }
+    .title{
+      margin-left: 10px;
+      font-size: 30px;
+      font-weight: 500;
+      color: forestgreen;
+    }
+  }
+  .list-con{
+    display: flex;
+    flex-direction: column;
+    margin-top: 30px;
+    max-height: 530px;
+    overflow-y: scroll;
+    .tx-item{
+      display: flex;
+      flex-direction: column;
+      margin-bottom: 16px;
+      border: white 1px solid;
+      border-radius: 12px;
+      padding: 12px;
+      background: #232429;
+      .avatar-con{
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: start;
+        .avatar-item{
+          display: flex;
+          flex-direction: row;
+          align-items: center;
+          .icon{
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: 2px solid white;
+          }
+          .tx-info{
+            display: flex;
+            flex-direction: column;
+            margin-left: 5px;
+            .tx-col{
+              display: flex;
+              flex-direction: row;
+              align-items: center;
+              margin-bottom: -5px;
+              .txid{
+                color: white;
+                font-size: 14px;
+                font-weight: 600;
+              }
+              .chain{
+                margin-left: 5px;
+                padding: 2px 4px;
+                border-radius: 4px;
+                border: white solid 1px;
+                color: white;
+                font-family: "Apple PingFang SC";
+                font-size: 10px;
+                font-weight: 600;
+              }
+            }
+            .amount-con{
+              display: flex;
+              flex-direction: row;
+              align-items: center;
+              margin-right: auto;
+              margin-top: 5px;
+              .amount{
+                color: #F3740D;
+                font-size: 18px;
+                font-weight: 500;
+                text-align: left;
+              }
+              .tip{
+                margin-left: 5px;
+                color: white;
+                font-size: 14px;
+                font-weight: 400;
+              }
+            }
+
+          }
+        }
+        .ctrl-con{
+          display: flex;
+          flex-direction: row;
+          align-items: center;
+          .copy{
+            width: 24px;
+            height: 24px;
+            margin-right: 10px;
+          }
+          .chrome{
+            width: 24px;
+            height: 24px;
+          }
+        }
+      }
+      .center-con{
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        .icon{
+          width: 32px;
+          height: 32px;
+          margin-left: 3px;
+        }
+        .progress-col{
+          display: flex;
+          flex-direction: column;
+          margin-left: 12px;
+          .line-con{
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            .line-u{
+              width: 320px;
+              background-color: #d8d8d8;
+              height: 3px;
+              border-radius: 1.5px;
+              margin-top: 20px;
+            }
+            .line-d{
+              margin-top: -22px;
+              width: 320px;
+              background-color: #88F30D;
+              height: 3px;
+              border-radius: 1.5px;
+              margin-top: 20px;
+            }
+          }
+          .progress-con{
+            display: flex;
+            flex-direction: row;
+            align-items: start;
+            justify-content: space-around;
+            padding: 12px;
+            margin-top: -20px;
+            .progress-item{
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+              z-index: 20;
+              .circle-u{
+                width: 12px;
+                height: 12px;
+                border-radius: 6px;
+                background-color: #d8d8d8;
+              }
+              .circle-d{
+                width: 12px;
+                height: 12px;
+                border-radius: 6px;
+                background-color: #88F30D;
+              }
+              .text{
+                margin-top: 5px;
+                color: #88F30D;
+                font-size: 12px;
+                font-weight: 500;
+              }
+              .submit-btn{
+                margin-top: 10px;
+                //width: 80px;
+                padding: 6px 12px;
+                color: white;
+                font-weight: 700;
+                user-select: none;
+                font-size: 12px;
+                text-align: center;
+                justify-content: center;
+                background-color: #2051F4;
+                border-radius: calc(50vh);
+              }
+            }
+          }
+        }
+      }
+      .bottom-con{
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: start;
+        .avatar-item{
+          display: flex;
+          flex-direction: row;
+          align-items: center;
+          .icon{
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: 2px solid white;
+          }
+          .tx-info{
+            display: flex;
+            flex-direction: column;
+            margin-left: 5px;
+            .tx-col{
+              display: flex;
+              flex-direction: row;
+              align-items: center;
+              margin-bottom: -5px;
+              .txid{
+                color: white;
+                font-size: 16px;
+                font-weight: 600;
+              }
+              .chain{
+                margin-left: 5px;
+                padding: 2px 4px;
+                border-radius: 4px;
+                border: white solid 1px;
+                color: white;
+                font-family: "Apple PingFang SC";
+                font-size: 10px;
+                font-weight: 600;
+              }
+            }
+            .amount-con{
+              display: flex;
+              flex-direction: row;
+              align-items: center;
+              margin-right: auto;
+              margin-top: 5px;
+              .amount{
+                color: #88F30D;
+                font-size: 18px;
+                font-weight: 500;
+                text-align: left;
+              }
+              .tip{
+                margin-left: 5px;
+                color: white;
+                font-size: 14px;
+                font-weight: 400;
+              }
+              .unconfirm{
+                margin-left: 5px;
+                color: #F3740D;
+                font-size: 14px;
+                font-weight: 500;
+                font-family: "Apple Braille";
+              }
+              .done{
+                width: 14px;
+                height: 14px;
+                margin-left: 5px;
+              }
+            }
+          }
+        }
+        .ctrl-con{
+          display: flex;
+          flex-direction: row;
+          align-items: center;
+          .copy{
+            width: 24px;
+            height: 24px;
+            margin-right: 12px;
+          }
+          .chrome{
+            width: 24px;
+            height: 24px;
+          }
+        }
+      }
+    }
+  }
+  .no-data{
+    display: flex;
+    flex-direction: column;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 100px;
+    align-items: center;
+    .nodata-icon{
+      width: 200px;
+      height: 200px;
+    }
+    .nodata-lab{
+      margin-top: -20px;
+      color: white;
+      font-size: 16px;
+      font-weight: 500;
+      text-align: center;
+    }
+  }
+  .close-btn{
+    color:white;
+    margin-left: auto;
+    margin-right: auto;
+    align-content: center;
+    align-items: center;
+    font-size: 24px;
+    padding: 20px 60px;
+    border-radius: calc(50vh);
+    background: linear-gradient(90deg,#3C1EB5,#B5264F);
+    margin-top: 40px;
+    font-weight: 600;
+    user-select: none;
+  }
+}

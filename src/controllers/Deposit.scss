@@ -2,7 +2,7 @@
   display: flex;
   flex-direction: column;
   width: 380px;
-  height: 614px;
+  height: 664px;
   background-color: #010201;
   background-size: cover;
   background-image: url("../assets/normal_bg.png");
@@ -32,6 +32,7 @@
           width: 40px;
           height: 40px;
           border-radius: 50%;
+          border: white 3px solid;
         }
         .address-con{
           margin-left: 5px;
@@ -50,6 +51,12 @@
             .switch-icon{
               width: 12px;
               height: 12px;
+              margin-left: 5px;
+            }
+
+            .export-icon{
+              width: 14px;
+              height: 14px;
               margin-left: 5px;
             }
           }
@@ -291,12 +298,23 @@
         flex-direction: column;
         align-items: center;
         margin-top: 30px;
+        .error-des{
+          color: #EA373C;
+          font-size: 12px;
+          font-weight: 500;
+          font-family: Tomorrow;
+          margin-right: auto;
+          margin-left: auto;
+          margin-bottom: 5px;
+          text-align: center;
+        }
         .estimate-miner-fee{
           display: flex;
           flex-direction: row;
           margin-left: auto;
           margin-right: auto;
           text-align: center;
+          align-items: center;
           .des{
             color: white;
             font-size: 14px;
@@ -309,6 +327,20 @@
             font-size: 14px;
             font-family: Tomorrow;
             font-weight: bold;
+            margin-right: 3px;
+          }
+          .total-cost-valid{
+            color: #80df8a;
+            font-size: 12px;
+            font-weight: 500;
+            font-family: Tomorrow;
+            margin-right: auto;
+          }
+          .total-cost-invalid{
+            color: #EA373C;
+            font-size: 12px;
+            font-weight: 500;
+            font-family: Tomorrow;
             margin-right: auto;
           }
         }
@@ -379,11 +411,31 @@
           height: 42px;
           padding-left: 10px;
           padding-right: 10px;
-          .title{
-            color: #0E0D0D;
-            font-size: 18px;
-            font-family: Tomorrow;
-            font-weight: 500;
+          .title-con{
+            display: flex;
+            flex-direction: column;
+            .title{
+              color: #0E0D0D;
+              font-size: 18px;
+              font-family: Tomorrow;
+              font-weight: 500;
+            }
+            .uncomplete-con{
+              display: flex;
+              flex-direction: row;
+              align-items: center;
+              margin-top: -8px;
+              .lab{
+                color: #0E0D0D;
+                font-size: 12px;
+                font-weight: 400;
+                .num{
+                  color: #228b22;
+                  font-size: 14px;
+                  font-weight: bold;
+                }
+              }
+            }
           }
           .icon{
             width: 12px;
@@ -409,6 +461,7 @@
           width: 40px;
           height: 40px;
           border-radius: 50%;
+          border: white 3px solid;
         }
         .address-con{
           margin-left: 5px;
@@ -427,6 +480,11 @@
             .switch-icon{
               width: 12px;
               height: 12px;
+              margin-left: 5px;
+            }
+            .export-icon{
+              width: 14px;
+              height: 14px;
               margin-left: 5px;
             }
           }
@@ -610,6 +668,33 @@
         filter: brightness(130%);
       }
     }
+    //.uncomplete-con{
+    //  display: flex;
+    //  flex-direction: row;
+    //  align-items: center;
+    //  margin-left: auto;
+    //  margin-right: auto;
+    //  padding: 3px 12px;
+    //  border: 1px solid white;
+    //  border-radius: calc(50vh);
+    //  margin-bottom: 10px;
+    //  background-color: #32364a9A;
+    //  .icon{
+    //    width: 12px;
+    //    height: 12px;
+    //  }
+    //  .lab{
+    //    color: white;
+    //    font-size: 12px;
+    //    font-weight: 400;
+    //    margin-bottom: 3px;
+    //    .num{
+    //      color: #80df8a;
+    //      font-size: 16px;
+    //      font-weight: 600;
+    //    }
+    //  }
+    //}
     .info-con{
       display: flex;
       flex-direction: column;
@@ -726,43 +811,111 @@
         }
       }
 
-      .confirm-btn-disable{
-        color: white;
-        user-select: none;
-        background: #131937;
-        border-radius: 22px;
-        text-align: center;
-        font-family: Tomorrow;
-        font-weight: 600;
-        font-size: 18px;
-        height: 42px;
-        display: flex;
+      .confirm-con{
+        display: block;
         flex-direction: column;
-        justify-content: center;
+        align-items: center;
         margin-top: 30px;
-      }
+        .error-des{
+          color: #EA373C;
+          font-size: 12px;
+          font-weight: 500;
+          font-family: Tomorrow;
+          margin-right: auto;
+          margin-left: auto;
+          margin-bottom: 5px;
+          text-align: center;
+        }
+        .estimate-miner-fee{
+          display: flex;
+          flex-direction: row;
+          margin-left: auto;
+          margin-right: auto;
+          text-align: center;
+          .des{
+            color: white;
+            font-size: 14px;
+            font-weight: 400;
+            font-family: Tomorrow;
+            margin-left: auto;
+          }
+          .value{
+            color: white;
+            font-size: 14px;
+            font-family: Tomorrow;
+            font-weight: bold;
+          }
+          .total-cost-valid{
+            color: #80df8a;
+            font-size: 12px;
+            font-weight: 500;
+            font-family: Tomorrow;
+            margin-right: auto;
+          }
+          .total-cost-invalid{
+            color: #EA373C;
+            font-size: 12px;
+            font-weight: 500;
+            font-family: Tomorrow;
+            margin-right: auto;
+          }
+        }
 
-      .confirm-btn{
-        color: white;
-        user-select: none;
-        background: #2051F4;
-        border-radius: 22px;
-        text-align: center;
-        font-family: Tomorrow;
-        font-weight: 600;
-        font-size: 18px;
-        height: 42px;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        margin-top:30px;
+        .fee-detail{
+          display: flex;
+          flex-direction: row;
+          align-items: center;
+          margin-left: auto;
+          margin-right: auto;
+          margin-top: 20px;
+          .tips{
+            color: white;
+            font-size: 14px;
+            font-family: Tomorrow;
+            font-weight: 600;
+          }
+          .icon{
+            width: 14px;
+            height: 14px;
+          }
+        }
+
+        .confirm-btn-disable{
+          color: white;
+          user-select: none;
+          background: #131937;
+          border-radius: 22px;
+          text-align: center;
+          font-family: Tomorrow;
+          font-weight: 600;
+          font-size: 18px;
+          height: 42px;
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+        }
+
+        .confirm-btn{
+          color: white;
+          user-select: none;
+          background: #2051F4;
+          border-radius: 22px;
+          text-align: center;
+          font-family: Tomorrow;
+          font-weight: 600;
+          font-size: 18px;
+          height: 42px;
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+        }
       }
 
       .history-con{
         background: #6C9BD4;
         border-radius: 8px;
         height: 42px;
-        margin-top: 40px;
+        margin-top: 20px;
         .inner-con{
           display: flex;
           flex-direction: row;
@@ -774,11 +927,31 @@
           height: 42px;
           padding-left: 10px;
           padding-right: 10px;
-          .title{
-            color: #0E0D0D;
-            font-size: 18px;
-            font-family: Tomorrow;
-            font-weight: 500;
+          .title-con{
+            display: flex;
+            flex-direction: column;
+            .title{
+              color: #0E0D0D;
+              font-size: 18px;
+              font-family: Tomorrow;
+              font-weight: 500;
+            }
+            .uncomplete-con{
+              display: flex;
+              flex-direction: row;
+              align-items: center;
+              margin-top: -8px;
+              .lab{
+                color: #0E0D0D;
+                font-size: 12px;
+                font-weight: 400;
+                .num{
+                  color: #228b22;
+                  font-size: 14px;
+                  font-weight: bold;
+                }
+              }
+            }
           }
           .icon{
             width: 12px;
@@ -790,8 +963,8 @@
   }
   .menu{
     position: absolute;
-    top: 60px;
-    right: 10px;
+    top: 300px;
+    right: 50px;
     z-index: 999;
     display: flex;
     flex-direction: column;
@@ -887,6 +1060,130 @@
       background: #6a6a6a;
       margin-top: 10px;
       margin-bottom: 10px;
+    }
+  }
+
+  .show-private-menu{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin-top: -200px;
+    margin-left: -150px;
+    z-index: 999;
+    display: flex;
+    flex-direction: column;
+    background: #313337;
+    border-radius: 8px;
+    width: 300px;
+    padding: 12px;
+    .header-con{
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+      .icon{
+        width: 20px;
+        height: 20px;
+      }
+      .title{
+        font-size: 18px;
+        font-weight: 600;
+        color: white;
+        font-family: Tomorrow;
+      }
+    }
+    .ava{
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      margin-top: 10px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .addr{
+      color: white;
+      font-size: 14px;
+      font-weight: 500;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .waring-p{
+      border-radius: 8px;
+      background-color: #E3592160;
+      padding: 10px;
+      color: darkorange;
+      font-size: 14px;
+      font-weight: 500;
+      .warning-icon{
+        width: 14px;
+        height: 14px;
+        margin-right: 5px;
+      }
+    }
+
+    .tips{
+      color: white;
+      font-size: 14px;
+      font-weight: 400;
+      font-family: Tomorrow;
+    }
+
+    .input-tx{
+      margin-top: 8px;
+      color: white;
+      font-size: 18px;
+      font-weight: 600;
+      font-family: Tomorrow;
+      padding: 10px 12px;
+      border: 1px white solid;
+      border-radius: 8px;
+      background: #010201;
+    }
+
+    .private-key-con{
+      background-color: #232429;
+      padding: 10px;
+      color: white;
+      font-size: 14px;
+      font-weight: 500;
+      word-break: break-all;
+      border-radius: 8px;
+      .copy-icon{
+        width: 16px;
+        height: 16px;
+        margin-left: 5px;
+      }
+    }
+
+    .show-btn-disable{
+      margin-top: 20px;
+      color: white;
+      background: #131937;
+      border-radius: 22px;
+      text-align: center;
+      font-family: Tomorrow;
+      font-weight: 600;
+      font-size: 18px;
+      height: 42px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .show-btn{
+      margin-top: 20px;
+      color: white;
+      background: #2051F4;
+      border-radius: 22px;
+      text-align: center;
+      font-family: Tomorrow;
+      font-weight: 600;
+      font-size: 18px;
+      height: 42px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
     }
   }
 }

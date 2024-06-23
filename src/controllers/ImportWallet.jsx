@@ -43,12 +43,12 @@ function ImportWallet(){
                             <img src={right_arrow} className="icon"/>
                         </div>
                     </div>
-                    {/*<div className="import-item hover-brighten" style={{marginTop:"12px"}} onClick={clickImportPrivateKey}>*/}
-                    {/*    <div className="inner-con  hover-brighten">*/}
-                    {/*        <span className="title">Import by private keys</span>*/}
-                    {/*        <img src={right_arrow} className="icon"/>*/}
-                    {/*    </div>*/}
-                    {/*</div>*/}
+                    <div className="import-item hover-brighten" style={{marginTop:"12px"}} onClick={clickImportPrivateKey}>
+                        <div className="inner-con  hover-brighten">
+                            <span className="title">Import by private keys</span>
+                            <img src={right_arrow} className="icon"/>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

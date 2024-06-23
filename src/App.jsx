@@ -15,6 +15,7 @@ import RedeemSign from "./controllers/RedeemSign.jsx";
 import ConnectRequest from "./controllers/ConnectRequest.jsx";
 import DepositHistory from "./controllers/DepositHistory.jsx";
 import SubmitProof from "./controllers/SubmitProof.jsx";
+import {RedeemHistory} from "./controllers/RedeemHistory";
 
 const AnimatedPageSwitcher = ({ children }) => {
     return (
@@ -48,6 +49,7 @@ function App() {
                       <Route path='/ConnectRequest' element={<ConnectRequest/>}/>
                       <Route path='/DepositHistory' element={<DepositHistory/>}/>
                       <Route path='/SubmitProof' element={<SubmitProof/>}/>
+                      <Route path='/RedeemHistory' element={<RedeemHistory/>}/>
                   </Routes>
               </AnimatedPageSwitcher>
           </HashRouter>

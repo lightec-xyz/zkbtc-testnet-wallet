@@ -128,6 +128,13 @@
             font-size: 14px;
             font-weight: 600;
           }
+          .value-invalid{
+            margin-left: 5px;
+            color: #EA373C;
+            font-family: Tomorrow;
+            font-size: 14px;
+            font-weight: 600;
+          }
         }
         .item-vertical{
           display: flex;
@@ -140,8 +147,14 @@
             font-weight: 400;
           }
           .value{
-            margin-left: 5px;
             color: white;
+            font-family: Tomorrow;
+            font-size: 14px;
+            font-weight: 600;
+          }
+          .value-invalid{
+            margin-left: 5px;
+            color: #EA373C;
             font-family: Tomorrow;
             font-size: 14px;
             font-weight: 600;

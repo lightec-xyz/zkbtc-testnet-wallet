@@ -4,7 +4,7 @@
   width: 380px;
   height: 614px;
   background-color: #010201;
-  background-size: contain;
+  background-size: cover;
   background-image: url("../assets/normal_bg.png");
   .deposit-con{
     display: flex;
@@ -65,12 +65,30 @@
       }
     }
 
+    .cost-con{
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      margin-left: auto;
+      color: white;
+      .tips{
+        color: white;
+        font-size: 12px;
+        font-weight: 400;
+      }
+      .values{
+        color: white;
+        font-size: 14px;
+        font-weight: 600;
+      }
+    }
+
     .estimate-con{
       display: flex;
       flex-direction: row;
       align-items: center;
-      margin-top: 20px;
       margin-left: auto;
+      margin-top: 12px;
       .arrival-con{
         display: flex;
         flex-direction: column;
@@ -86,7 +104,7 @@
           flex-direction: row;
           align-items: center;
           margin-left: auto;
-          margin-top: 5px;
+          margin-top: -4px;
           .value{
             color: white;
             font-size: 16px;
@@ -108,7 +126,7 @@
       display: flex;
       flex-direction: row;
       align-items: center;
-      margin-top: 40px;
+      margin-top: 20px;
       width: 100%;
       justify-content: space-between;
       .cancel{

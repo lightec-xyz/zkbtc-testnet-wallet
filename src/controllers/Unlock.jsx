@@ -23,10 +23,15 @@ function Unlock(){
     useEffect(  () => {
         // 获取当前页面 URL 的查询参数
         const searchParams = new URLSearchParams(window.location.search);
+        console.log('searchParams',searchParams)
 
         // 获取特定参数的值
         let typeParam = searchParams.get('type')
         let extParam = searchParams.get('params')
+        if(extParam && extParam.length > 0){
+            extParam = extParam.replace("HASH_ROUTER/",'#/')
+        }
+        console.log('typeParam,extParam',typeParam,extParam)
         setType(typeParam)
         setExternalParams(extParam)
 
@@ -45,6 +50,9 @@ function Unlock(){
                         return
                     }else if(typeParam == 'connect'){
                         navigate('/ConnectRequest',{state:params})
+                        return
+                    }else if(typeParam == 'submit_proof'){
+                        navigate('/SubmitProof',{state:params})
                         return
                     }
                     navigate('/Deposit')
@@ -68,6 +76,8 @@ function Unlock(){
                 params['close_window'] = 1
             }
 
+            console.log('jump type',type,params)
+
             if(type == 'deposit'){
                 navigate('/DepositSign',{state:params})
                 return
@@ -77,37 +87,46 @@ function Unlock(){
             }else if(type == 'connect'){
                 navigate('/ConnectRequest',{state:params})
                 return
+            }else if(type == 'submit_proof'){
+                navigate('/SubmitProof',{state:params})
+                return
             }
             navigate('/Deposit')
         }).catch(error=>{
             message.open({
                 type:'error',
-                content:error.message
+                content:'Password incorrect'
             })
         })
     }
 
-    const inputPassword = e=>{
+    const inputPassword = e=> {
         let val = e.target.value
         setPassword(val)
-        if(val.length >= 6){
+        if (val.length >= 6) {
             setEnable(1)
-        }else{
+        } else {
             setEnable(0)
+        }
+    }
+
+    const handleKeyDown = (event) => {
+        if (event.key !== undefined && event.key === 'Enter') {
+            jumpPage()
         }
     }
 
     return (<div className="unlock-main">
 
         <Header/>
-        <div className="password-con">
+        <form className="password-con" onKeyDown={handleKeyDown}>
             <span className="tips">Unlock by password</span>
-            <input className="input-tx" type='password' onChange={inputPassword}/>
+            <input className="input-tx" type='password' onChange={inputPassword} value={password}/>
             {
                 enable == 0 ? <div className="unlock-btn-disable" >Unlock</div> :
                     <div className="unlock-btn hover-brighten" onClick={jumpPage}>Unlock</div>
             }
-        </div>
+        </form>
     </div> )
 }
 

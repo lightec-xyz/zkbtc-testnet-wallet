@@ -1,4 +1,6 @@
 import CryptoJS from 'crypto-js'
+import {NODE_RPC, SYS_BITCOIN_ADDRESS} from "./contracts/abi.jsx";
+import axios from "axios";
 export function saveUnlockState(){
     let time = new Date().getTime()
     if (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.id) {
@@ -89,7 +91,7 @@ export async function checkUserInputPasswordValid(inputPassword){
                             })
                         }else{
                             reject({
-                                message:'niubi'
+                                message:'password incorrect'
                             })
                         }
                     }catch (e) {
@@ -203,7 +205,7 @@ export function AESDecrypt(encrypt,password,times){
 }
 
 export function formatNumber(num,fixed){
-    return parseInt(num*(10**fixed))/(10**fixed)
+    return Math.round(num*(10**fixed))/(10**fixed)
 }
 
 export function convertToCenterEplis(text,length = 8){
@@ -213,4 +215,83 @@ export function convertToCenterEplis(text,length = 8){
         return start+'...'+end
     }
     return text
+}
+
+export const parseBitcoinTx = (item,bitcoinAddr)=>{
+    let parseResults = {type:0,amount:0,txHash:'',confirmed:false}
+    let inputs = item.vin || []
+    let outputs = item.vout || []
+    parseResults.txHash = item.txid
+    parseResults.confirmed = item.status.confirmed
+
+    let sendAmount = 0
+    let receiveAmount = 0
+    let depositAmount = 0
+    let receiveAccount = null
+    let findSystem = false
+    inputs.forEach((ipt)=>{
+        console.log('input address=>',ipt.prevout.scriptpubkey_address)
+        if(ipt.prevout.scriptpubkey_address == bitcoinAddr){
+            sendAmount += ipt.value
+        }
+        if(ipt.prevout.scriptpubkey_address == SYS_BITCOIN_ADDRESS){
+            findSystem = true
+        }
+    })
+
+    outputs.forEach((opt)=>{
+        if(opt.scriptpubkey_address == bitcoinAddr){
+            receiveAmount += opt.value
+        }
+        if(opt.scriptpubkey_address == SYS_BITCOIN_ADDRESS){
+            depositAmount += opt.value
+        }
+        if(opt.scriptpubkey_type  == "op_return"){
+            receiveAccount = '0x'+opt.scriptpubkey.slice(4)
+            console.log('find address',opt)
+        }
+    })
+
+    if(sendAmount > 0){
+        parseResults.type = 0
+        parseResults.amount = sendAmount
+    }
+    if(receiveAmount > 0){
+        parseResults.type = 1
+        parseResults.amount = receiveAmount
+        if(findSystem){
+            parseResults.type = 3
+            parseResults.amount = receiveAmount
+        }
+    }
+    if(depositAmount > 0 && receiveAccount != null){
+        parseResults.type = 2
+        parseResults.receive_address = receiveAccount
+        parseResults.amount = depositAmount
+    }
+    parseResults.submit_status = -1
+    console.log('parse =>',parseResults)
+    return parseResults
+}
+
+export async function openFaucet(){
+    let openurl = 'https://testnet.zkbtc.money/?state=3'
+
+    let foundTab = null;
+    const tabs = await chrome.tabs.query({});
+    // 遍历所有标签页，检查是否已经打开了目标URL
+    for (let tab of tabs) {
+        if (tab.url && tab.url === openurl) {
+            foundTab = tab;
+            break;
+        }
+    }
+
+    if(foundTab){
+        // 如果标签页已打开，切换到该标签页
+        await chrome.tabs.update(foundTab.id, { active: true });
+        chrome.windows.update(foundTab.windowId, { focused: true });
+    }else{
+        chrome.tabs.create({url:openurl})
+    }
 }

@@ -1,6 +1,7 @@
 import './DepositHistory.scss'
 import back_icon from '../assets/fanhui.png'
-import deposit_icon from '../assets/chuankuayue.png'
+import deposit_icon from '../assets/deposit_icon.png'
+import redeem_icon from '../assets/redeem_icon.png'
 import browser_icon from '../assets/liulanqi1-mianxing.png'
 import send_icon from '../assets/feijiqifei.png'
 import receive_icon from '../assets/jiangla.png'
@@ -16,7 +17,7 @@ import {
     getUtxoIsSubmitted
 } from "../utils/blockcypher.jsx";
 import {useNavigate} from "react-router-dom";
-import {convertToCenterEplis, getStorageItem} from "../utils/utils.jsx";
+import {convertToCenterEplis, getStorageItem, parseBitcoinTx} from "../utils/utils.jsx";
 import {SYS_BITCOIN_ADDRESS} from "../utils/contracts/abi.jsx";
 import {message, Spin} from "antd";
 import submitProof from "./SubmitProof.jsx";
@@ -29,7 +30,7 @@ function DepositHistory(){
     let [parserlts,setParserlts] = useState([])
     let [loading,setLoading] = useState(0)
     let [proofStatus,setProofStatus] = useState({})
-    useEffect(    ()=>{
+    useEffect(()=>{
         async function fetchData(){
             setLoading(1)
             bitcoinAddr = await getStorageItem('BTC_ADDR')
@@ -40,7 +41,7 @@ function DepositHistory(){
             let parse = []
             let txIds = []
             txs.map((item,index)=>{
-                parse[index] = parseInfo(item)
+                parse[index] = parseBitcoinTx(item,bitcoinAddr)
                 if(parse[index].type == 2){
                     txIds.push('0x'+parse[index].txHash)
                 }
@@ -52,13 +53,12 @@ function DepositHistory(){
 
             let submitTxids = []
             txIds.map((tx,index)=>{
-                if(statusMap[tx.slice(2)] == 2){
-                    submitTxids.push(tx)
-                }
+                submitTxids.push(tx)
             })
 
             submitTxids.map((subtx,index)=>{
-                getUtxoIsSubmitted(subtx,flag=>{
+                getUtxoIsSubmitted(subtx).then(flag=>{
+                    console.log('subtx => ',subtx,flag)
                     var update = false
                     let newList = parse.map(item=>{
                         if(item.txHash == subtx.slice(2)){
@@ -77,7 +77,19 @@ function DepositHistory(){
             setLoading(0)
         }
         fetchData()
+
+        let timeId = setTimeout(()=>{
+            if(loading == 1){
+                message.open({
+                    type:'warning',
+                    content:'Time out'
+                })
+                clickBack()
+            }
+        },30000)
+
         return ()=>{
+            clearTimeout(timeId)
             console.log('history unamounted')
         }
     },[])
@@ -88,55 +100,6 @@ function DepositHistory(){
 
     function clickSubmit(item){
         navigate('/SubmitProof',{state:item})
-    }
-
-    const parseInfo = (item)=>{
-        let parseResults = {type:0,amount:0,txHash:''}
-        let inputs = item.vin || []
-        let outputs = item.vout || []
-        parseResults.txHash = item.txid
-
-        let sendAmount = 0
-        let receiveAmount = 0
-        let depositAmount = 0
-        let receiveAccount = null
-        inputs.forEach((ipt)=>{
-            if(ipt.prevout.scriptpubkey_address == bitcoinAddr){
-                sendAmount += ipt.value
-            }
-        })
-
-        outputs.forEach((opt)=>{
-            console.log('opt addresses',opt.addresses)
-            if(opt.scriptpubkey_address == bitcoinAddr){
-                receiveAmount += opt.value
-            }
-            if(opt.scriptpubkey_address == DEPOSIT_ADDRESS){
-                depositAmount += opt.value
-                console.log('find deposit',opt)
-            }
-            if(opt.scriptpubkey_type  == "op_return"){
-                receiveAccount = '0x'+opt.scriptpubkey.slice(4)
-                console.log('find address',opt)
-            }
-        })
-
-        if(sendAmount > 0){
-            parseResults.type = 0
-            parseResults.amount = sendAmount
-        }
-        if(receiveAmount > 0){
-            parseResults.type = 1
-            parseResults.amount = receiveAmount
-        }
-        if(depositAmount > 0 && receiveAccount != null){
-            parseResults.type = 2
-            parseResults.receive_address = receiveAccount
-            parseResults.amount = depositAmount
-        }
-        parseResults.submit_status = false
-        console.log('parse =>',parseResults)
-        return parseResults
     }
 
     function clickCopy(hash){
@@ -162,7 +125,7 @@ function DepositHistory(){
             <div className='deposit-his-main'>
                 <div className='header-con'>
                     <img className='back-icon' src={back_icon} onClick={clickBack}/>
-                    <span className='title'>Deposit history</span>
+                    <span className='title'>History List</span>
                     <div/>
                 </div>
                 {
@@ -215,22 +178,43 @@ function DepositHistory(){
                                                 <img className='browser-icon hover-brighten-large' src={browser_icon} onClick={()=>{openInBrowser(item.txHash)}}/>
                                             </div>
                                         }
+                                        {
+                                            item.type == 3 && <div className='top'>
+                                                <div className='left'>
+                                                    <img src={redeem_icon} className='icon'/>
+                                                    <div className='info-cen'>
+                                                        <a className='type-lab'>Redeem</a>
+                                                        <div className='txhash-con'>
+                                                            <span className='txhash'>{'0x'+convertToCenterEplis(item.txHash,6)}</span>
+                                                            <img className='copy-btn hover-brighten-large' src={copy_icon} onClick={()=>{clickCopy(item.txHash)}}/>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <img className='browser-icon hover-brighten-large' src={browser_icon} onClick={()=>{openInBrowser(item.txHash)}}/>
+                                            </div>
+                                        }
                                         <div className='bottom-con'>
                                             <div className='value-con'>
                                                 {
-                                                    item.type == 1 ? <span className='value-lab'>+ {item.amount/(10**8)}</span> :
+                                                    item.type == 1 || item.type == 3 ? <span className='value-lab'>+ {item.amount/(10**8)}</span> :
                                                         <span className='value-lab-out'>- {item.amount/(10**8)}</span>
                                                 }
                                                 <span className='unit-lab'>tBTC</span>
                                             </div>
                                             {
-                                                item.type == 2 && proofStatus[item.txHash] == 2 && item.submit_status == false && <div className='submit-btn hover-brighten' onClick={()=>{clickSubmit(item)}}>Submit</div>
+                                                item.type == 2 && proofStatus[item.txHash] == 4 && item.submit_status == -1 && <Spin spinning={1} size="small"/>
                                             }
                                             {
-                                                item.type == 2 && proofStatus[item.txHash] == 2 && item.submit_status == true && <img className='done-btn hover-brighten' src={done}/>
+                                                item.type == 2 && proofStatus[item.txHash] == 4 && item.submit_status == false && <div className='submit-btn hover-brighten' onClick={()=>{clickSubmit(item)}}>Submit</div>
                                             }
                                             {
-                                                item.type == 2 && proofStatus[item.txHash] != 2 && <div className='wait-btn hover-brighten'>Pending</div>
+                                                item.type == 2  && item.submit_status == true && <img className='done-btn hover-brighten' src={done}/>
+                                            }
+                                            {
+                                                item.type == 2 && item.confirmed == false && proofStatus[item.txHash] != 4 && <div className='wait-btn'>Unconfirmed</div>
+                                            }
+                                            {
+                                                item.type == 2 && item.confirmed == true && item.submit_status == false && proofStatus[item.txHash] != 4 && <div className='wait-btn'>Generating proof</div>
                                             }
                                         </div>
                                     </div>

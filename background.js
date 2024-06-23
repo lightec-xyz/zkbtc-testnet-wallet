@@ -31,7 +31,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
             type: "popup",
             focused: true,
             width: 380,
-            height: 614,
+            height: 640,
             top: 80,
             left: 1000,
         })
@@ -44,7 +44,20 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
             type: "popup",
             focused: true,
             width: 380,
-            height: 614,
+            height: 620,
+            top: 80,
+            left: 1000,
+        })
+        sendResponse('redeem request background.js received')
+    }
+
+    if(request.type === 'submit_proof'){
+        chrome.windows.create({
+            url:'index.html?type=submit_proof&params='+request.connect_info,
+            type: "popup",
+            focused: true,
+            width: 380,
+            height: 720,
             top: 80,
             left: 1000,
         })
@@ -74,11 +87,22 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
             }
         });
     }
+
+    if(request.type == 'active'){
+        sendResponse('Now active')
+    }
 });
 
 chrome.runtime.onInstalled.addListener(function(details) {
     if (details.reason === "install") {
-        console.log("This is a fresh install.");
+        chrome.tabs.query({currentWindow: true}, function(tabs) {
+            tabs.forEach(tab=>{
+                chrome.tabs.sendMessage(tab.id,{
+                    type:'zkbtc_wallet_installed_done',
+                    balance:request.balance
+                })
+            })
+        });
         chrome.storage.local.clear(()=>{
             console.log('clear all storage')
         })

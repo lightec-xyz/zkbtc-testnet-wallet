@@ -28,16 +28,24 @@ function SetUnlockPassword(){
         //         savePassword(password)
         //     }
         // })
+        const handleKeyDown = (event) => {
+            if (event.key === 'Enter') {
+                clickDone()
+            }
+        };
+        window.addEventListener('keydown', handleKeyDown);
+
         getUnlockPassword().then(password=>{
             if(password && password.length > 0){
                 savePassword(password)
             }
         })
         return ()=>{
+            window.removeEventListener('keydown', handleKeyDown);
             console.log('SetUnlockPassword will unamounted')
         }
-    },[])
-    async function clickDone(){
+    },[password,confirmPassword])
+    const clickDone = ()=>{
         if(password.length < 6){
             message.open({
                 type:'error',
@@ -58,7 +66,7 @@ function SetUnlockPassword(){
 
     const savePassword = (password)=>{
         setSubmit(1)
-        saveUnlockPassword(password, ()=>{
+        saveUnlockPassword(password,  async ()=>{
             saveUnlockState()
             saveVerifyData(password)
             let params = myParams
@@ -68,7 +76,7 @@ function SetUnlockPassword(){
             if (importType == 'create_wallet') {
                 let mnemonics = params.CREATE_MNEMONICS
                 console.log('获取保存的mnemonics',mnemonics)
-                let bitcoinAddress = createBitcoinWallet(password, mnemonics)
+                let bitcoinAddress = await createBitcoinWallet(password, mnemonics)
                 createEthreumWallet(password, mnemonics)
                 importAddressToNode(bitcoinAddress,false,res=>{
                     if(res.success == false){
@@ -77,7 +85,8 @@ function SetUnlockPassword(){
                 })
             } else if (importType == 'import_mnemonics') {
                 let mnemonics = params.IMPORT_MNEMONICS
-                let bitcoinAddress = createBitcoinWallet(password, mnemonics)
+                let bitcoinAddress = await createBitcoinWallet(password, mnemonics)
+                console.log('import_mnemonics => ',bitcoinAddress)
                 createEthreumWallet(password, mnemonics)
                 importAddressToNode(bitcoinAddress,true,res=>{
                     if(res.success == false){
@@ -121,6 +130,12 @@ function SetUnlockPassword(){
         checkIsValidPassword(password,val)
     }
 
+    // const handleKeyDown = e=>{
+    //     if (e.key === 'Enter') {
+    //         clickDone()
+    //     }
+    // }
+
     return (
         <Spin spinning={submit} size='large'>
             <div className="set-main">
@@ -135,7 +150,6 @@ function SetUnlockPassword(){
                         enable == 0 ? <div className="unlock-btn-disable" onClick={clickDone}>Set</div> :
                             <div className="unlock-btn hover-brighten" onClick={clickDone}>Set</div>
                     }
-
                 </div>
             </div>
         </Spin>

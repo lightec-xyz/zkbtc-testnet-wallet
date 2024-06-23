@@ -3,15 +3,47 @@ import Header from "./Header.jsx";
 import clear_icon from '../assets/clear.png'
 import {useNavigate} from "react-router-dom";
 import {message} from "antd";
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import {validateMnemonic} from "bip39";
+import {checkWalletExistsByMnemonics} from "../utils/create"
 
 function ImportByMnemonics(){
     const navigate = useNavigate();
     let [words,setWords] = useState(Array.from({length:12}))
     let [enable,setEnable] = useState(0)
+    let [mnemonics,setMnemonics] = useState('')
 
-    function clickImport(){
+    useEffect(() => {
+        const handlePaste = (e) => {
+            const pastedData = e.clipboardData.getData('text');
+            let seps = pastedData.split(' ')
+            if(seps.length == 0){
+                seps = pastedData.split(',')
+            }
+            if(seps.length > 2 && seps.length != 12){
+                message.open({
+                    type:'error',
+                    content:'Pasted format invalid'
+                })
+                return
+            }
+
+            if(seps.length == 12){
+                e.preventDefault();
+                setWords(seps)
+                setMnemonics(pastedData)
+                setEnable(1)
+            }
+        };
+
+        window.addEventListener('paste', handlePaste);
+
+        return () => {
+            window.removeEventListener('paste', handlePaste);
+        };
+    }, [mnemonics]);
+
+    async function clickImport(){
         if(checkWordsFull() == false){
             message.open({
                 type:'error',
@@ -29,6 +61,15 @@ function ImportByMnemonics(){
             return
         }
 
+        let exist = await checkWalletExistsByMnemonics(mnemonics)
+        if(exist != false){
+            message.open({
+                type:'error',
+                content:'The same wallet has been imported.'
+            })
+            return
+        }
+
         let params = {
             IMPORT_TYPE:'import_mnemonics',
             IMPORT_MNEMONICS:mnemonics
@@ -38,6 +79,7 @@ function ImportByMnemonics(){
     }
 
     function checkWordsFull(){
+        console.log('words =>',words)
         for(let i=0;i<12;i++){
             if(words[i] == undefined || words[i].length < 2){
                 setEnable(0)
@@ -61,6 +103,14 @@ function ImportByMnemonics(){
         checkWordsFull()
     }
 
+    const handleKeyDown = e=>{
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            e.stopPropagation();
+            clickImport()
+        }
+    }
+
     return (
         <div className="mn-main">
             <Header/>
@@ -72,56 +122,17 @@ function ImportByMnemonics(){
                     {/*    <span className="title">clear</span>*/}
                     {/*</div>*/}
                 </div>
-                <div className="gird-con">
-                    <div className="grid-item">
-                        <span className="index-num">1</span>
-                        <input className="word-text" value={words[0]} id={1} onChange={inputPhrase}/>
-                    </div>
-                    <div className="grid-item">
-                        <span className="index-num">2</span>
-                        <input className="word-text" id={2} value={words[1]} onChange={inputPhrase}/>
-                    </div>
-                    <div className="grid-item">
-                        <span className="index-num">3</span>
-                        <input className="word-text" id={3} onChange={inputPhrase}/>
-                    </div>
-                    <div className="grid-item">
-                        <span className="index-num">4</span>
-                        <input className="word-text" id={4} onChange={inputPhrase}/>
-                    </div>
-                    <div className="grid-item">
-                        <span className="index-num">5</span>
-                        <input className="word-text" id={5} onChange={inputPhrase}/>
-                    </div>
-                    <div className="grid-item">
-                        <span className="index-num">6</span>
-                        <input className="word-text" id={6} onChange={inputPhrase}/>
-                    </div>
-                    <div className="grid-item">
-                        <span className="index-num">7</span>
-                        <input className="word-text" id={7} onChange={inputPhrase}/>
-                    </div>
-                    <div className="grid-item">
-                        <span className="index-num">8</span>
-                        <input className="word-text" id={8} onChange={inputPhrase}/>
-                    </div>
-                    <div className="grid-item">
-                        <span className="index-num">9</span>
-                        <input className="word-text" id={9} onChange={inputPhrase}/>
-                    </div>
-                    <div className="grid-item">
-                        <span className="index-num">10</span>
-                        <input className="word-text" id={10} onChange={inputPhrase}/>
-                    </div>
-                    <div className="grid-item">
-                        <span className="index-num">11</span>
-                        <input className="word-text" id={11} onChange={inputPhrase}/>
-                    </div>
-                    <div className="grid-item">
-                        <span className="index-num">12</span>
-                        <input className="word-text" id={12} onChange={inputPhrase}/>
-                    </div>
-                </div>
+                <form className="gird-con" onKeyDown={handleKeyDown}>
+                    {
+                        words.map((word,index)=>(
+                            // eslint-disable-next-line react/jsx-key
+                            <div className="grid-item">
+                                <span className="index-num">{index+1}</span>
+                                <input className="word-text" value={word} id={index+1} onChange={inputPhrase}/>
+                            </div>
+                        ))
+                    }
+                </form>
                 {
                     enable == 0 ? <div className="btn-disable">Import</div> :
                         <div className="btn-enable hover-brighten" onClick={clickImport}>Import</div>

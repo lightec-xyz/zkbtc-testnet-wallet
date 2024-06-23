@@ -108,6 +108,8 @@
           align-items: center;
           margin-left: 30px;
           margin-top: -5px;
+          white-space: nowrap;
+          text-overflow: ellipsis;
           .value-lab{
             color: white;
             font-size: 24px;
@@ -138,16 +140,19 @@
         }
         .wait-btn{
           padding: 3px 10px;
-          color: #6a6a6a;
-          background: #ababab;
+          color: white;
           border-radius: 8px;
           font-size: 12px;
           font-weight: 600;
           margin-bottom: 10px;
+          border: white 1px solid;
+          white-space: nowrap;
+          text-overflow: ellipsis;
         }
         .done-btn{
           width: 18px;
           height: 18px;
+          margin-bottom: 10px;
         }
       }
     }

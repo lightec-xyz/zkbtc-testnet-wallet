@@ -1,11 +1,12 @@
 import "./DepositSign.scss"
 import Header from "./Header.jsx";
 import {useEffect, useState} from "react";
-import {deposit, estimateGasFee} from "../utils/blockcypher.jsx";
+import {deposit, estimateGasFee, getBitcoinTestnetBalance} from "../utils/blockcypher.jsx";
 import {Spin} from "antd";
 import {message} from "antd";
 import {useLocation, useNavigate} from "react-router-dom";
 import {convertToCenterEplis, formatNumber, getStorageItem} from "../utils/utils.jsx";
+import {ethers} from "ethers";
 
 function DepositSign(){
     const navigate = useNavigate();
@@ -14,6 +15,10 @@ function DepositSign(){
     let [receiveAddress,setReceiveAddress] = useState('')
     let [submit,setSubmit] = useState(0)
     let [minerFee,setMinerFee] = useState(0)
+    let [btcBalance,setBtcBalance] = useState(0)
+    let [loadBalance,setLoadBanlance] = useState(0)
+    let [loadFee,setLoadFee] = useState(0)
+    let [requestUrl,setRequestUrl] = useState(null)
 
     let location = useLocation()
     let params = location.state || {}
@@ -23,11 +28,18 @@ function DepositSign(){
         const depositInfo = params;
         setDepositAmount(depositInfo.deposit_amount)
         setReceiveAddress(depositInfo.receive_address)
+        setRequestUrl(depositInfo.url)
 
         getStorageItem("BTC_ADDR").then(btcAddr=>{
             estimateGasFee(depositInfo.deposit_amount,btcAddr,fee=>{
                 setMinerFee(fee)
+                setLoadFee(1)
             })
+        })
+        getBitcoinTestnetBalance(resp=>{
+            let bl = resp
+            setBtcBalance(bl)
+            setLoadBanlance(1)
         })
 
         // 在组件渲染后执行的操作
@@ -38,23 +50,47 @@ function DepositSign(){
     }, []);
 
     function clickConfirm(){
+        console.log('总花费=>',minerFee + Math.round(depositAmount*(10**8)),Math.round(btcBalance*(10**8)))
+        if(minerFee + Math.round(depositAmount*(10**8)) > Math.round(btcBalance*(10**8))){
+            message.open({
+                type:'error',
+                content:'Insufficient balance to pay miner fee'
+            })
+            return
+        }
+        if(Math.round(depositAmount*(10**8)) < 1000){
+            message.open({
+                type:'error',
+                content:'Deposit require a minimum of 1000 satoshi'
+            })
+            return
+        }
+        if(!ethers.isAddress(receiveAddress)){
+            message.open({
+                type:'error',
+                content:'The ethereum recipient address invalid'
+            })
+            return
+        }
         setSubmit(1)
         deposit(depositAmount,receiveAddress,()=>{
             setSubmit(0)
             message.success('Deposit success!')
+            if(params.close_window == 1){
+                chrome.tabs.query({url: `${requestUrl}`}, function(tabs) {
+                    if(tabs && tabs.length > 0){
+                        var currentTab = tabs[0]; // 在这里，tabs数组将只包含当前激活的标签页
+                        if (currentTab) {
+                            chrome.tabs.sendMessage(currentTab.id,{
+                                type:'signed',
+                                content:'deposit'
+                            })
+                        }
+                    }
+                });
+            }
             setTimeout(()=>{
                 if(params.close_window == 1){
-                    chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-                        // var currentTab = tabs[0]; // 在这里，tabs数组将只包含当前激活的标签页
-                        for(var tab in tabs){
-                            if (currentTab) {
-                                chrome.tabs.sendMessage(tab.id,{
-                                    type:'signed'
-                                })
-                            }
-                        }
-
-                    });
                     window.close()
                 }else{
                     navigate('/Deposit')
@@ -68,6 +104,7 @@ function DepositSign(){
                 content:'excution failed'
             })
         })
+
     }
 
     function clickCancel(){
@@ -79,7 +116,7 @@ function DepositSign(){
     }
 
     return (
-        <Spin size='large' spinning={submit}>
+        <Spin size='large' spinning={submit || loadBalance == 0 || loadFee == 0}>
             <div className="deposit-sign-main">
                 <Header/>
                 <div className="deposit-con">
@@ -96,7 +133,7 @@ function DepositSign(){
                     </div>
                     <div className="row-item">
                         <div className="row-con">
-                            <span className="tips">Ethereum Receive Address</span>
+                            <span className="tips">Ethereum Recipient Address</span>
                             <div className="val-con">
                                 <span className="value">{convertToCenterEplis(receiveAddress)}</span>
                             </div>

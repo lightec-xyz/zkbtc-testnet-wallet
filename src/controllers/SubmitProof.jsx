@@ -5,8 +5,9 @@ import edit from "../assets/xiugai.png"
 import logo from "../assets/logo.png"
 import {useEffect, useState} from "react";
 import {useLocation, useNavigate} from "react-router-dom";
-import {convertToCenterEplis, formatNumber, getStorageItem} from "../utils/utils.jsx";
+import {convertToCenterEplis, formatNumber, getStorageItem, openFaucet} from "../utils/utils.jsx";
 import {
+    estimateRedeemEthereumFee, estimateSubmmitProofGas,
     getHoleskyEthBalance,
     getSingleProofData,
     submitDepositProof
@@ -23,6 +24,11 @@ function SubmitProof(){
     let [submitBalance,setSubmitBalance] = useState(0)
     let [proofData,setProofData] = useState('')
     let [submit,setSubmit] = useState(0)
+    let [ethGas,setEthGas] = useState(0)
+    let [loadGas,setLoadGas] = useState(0)
+    let [loadEth,setLoadEth] = useState(0)
+    let [requestUrl,setRequestUrl] = useState(null)
+    let [estimateGasUsed,setEstimateGasUsed] = useState(0)
 
     let location = useLocation()
     let params = location.state || {}
@@ -33,13 +39,20 @@ function SubmitProof(){
             setSubmitAccount(ethAddr)
             getHoleskyEthBalance(bal=>{
                 setSubmitBalance(bal)
+                setLoadEth(1)
             })
         })
         setTransactionId('0x'+params.txHash)
         setDepositAmount(params.amount/(10**8))
-        setReceiveAccount('0x'+params.receive_address)
+        setReceiveAccount(params.receive_address)
+        setRequestUrl(params.url || null)
         getSingleProofData(params.txHash,proof=>{
             setProofData(proof)
+            estimateSubmmitProofGas('0x'+params.txHash,proof).then(res=>{
+                setEthGas(formatNumber(res.cost,6))
+                setEstimateGasUsed(res.estimateGas)
+                setLoadGas(1)
+            })
         })
         return () => {
             // 在组件卸载前执行的清理操作
@@ -47,24 +60,53 @@ function SubmitProof(){
         };
     }, []);
     function submitProof(){
+        if(ethGas > submitBalance){
+            message.open({
+                type:'error',
+                content:'Insufficient tETH to pay gas fee'
+            })
+            return
+        }
         setSubmit(1)
-        submitDepositProof(transactionId,proofData,flag=>{
+        submitDepositProof(transactionId,proofData,estimateGasUsed,flag=>{
             setSubmit(0)
-            navigate('/Deposit')
-            setTimeout(()=>{
-                message.success('zkBTC minted')
-            },3000)
+
+            if(params.close_window == 1){
+                chrome.tabs.query({url: `${requestUrl}`}, function(tabs) {
+                    if(tabs && tabs.length > 0){
+                        var currentTab = tabs[0]; // 在这里，tabs数组将只包含当前激活的标签页
+                        if (currentTab) {
+                            chrome.tabs.sendMessage(currentTab.id,{
+                                type:'proof_submitted',
+                                content:params.txHash
+                            })
+                        }
+                    }
+                });
+                setTimeout(()=>{
+                    window.close()
+                },500)
+            }else{
+                navigate('/Deposit',{state:{needUpdate:1}})
+                setTimeout(()=>{
+                    message.success('zkBTC minted')
+                },3000)
+            }
         },e=>{
             setSubmit(0)
             message.open({
                 type:'error',
-                content:'submit proof failed'
+                content:e
             })
         })
     }
 
     function clickCancel(){
-        navigate('/DepositHistory')
+        if(params.close_window == 1){
+            window.close()
+        }else{
+            navigate('/DepositHistory')
+        }
     }
 
     const proofInputChanged = (e)=>{
@@ -77,8 +119,12 @@ function SubmitProof(){
         setTransactionId(val)
     }
 
+    const clickFaucet = ()=>{
+        openFaucet()
+    }
+
     return (
-        <Spin size='large' spinning={submit}>
+        <Spin size='large' spinning={submit || loadEth == 0 || loadGas == 0}>
             <div className="submit-main">
                 <img className="favor-icon" src={logo}/>
                 <div className="submit-con">
@@ -96,7 +142,7 @@ function SubmitProof(){
                             <span className="tips">tETH Balance</span>
                             <div className="right-con">
                                 <span className="value">{formatNumber(submitBalance,6)}</span>
-                                <img src={facut} className="facut hover-brighten-large"/>
+                                <img src={facut} onClick={clickFaucet} className="facut hover-brighten-large"/>
                             </div>
                         </div>
                     </div>
@@ -119,8 +165,12 @@ function SubmitProof(){
                                 <span className="tips">tBTC</span>
                             </div>
                             <div className="item-vertical">
-                                <span className="tips">Ethereum Receive Address: </span>
+                                <span className="tips">Ethereum Recipient Address: </span>
                                 <span className="value">{receiveAccount}</span>
+                            </div>
+                            <div className="item">
+                                <span className="tips">Gas Fee: </span>
+                                <span className={ethGas > submitBalance ? "value-invalid" : "value"}>{ethGas} tETH</span>
                             </div>
                         </div>
                     </div>

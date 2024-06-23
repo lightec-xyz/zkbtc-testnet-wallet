@@ -8,7 +8,7 @@ import {address, payments,crypto} from "bitcoinjs-lib";
 import {Buffer} from 'safe-buffer';
 import {getStorageItem, saveStorageItem} from "./utils.jsx";
 import {hash256} from "bitcoinjs-lib/src/crypto.js";
-import {keccak256} from 'ethereumjs-util'
+import {keccak256} from "js-sha3";
 import {message} from "antd";
 import {importAddressToNode} from "./blockcypher.jsx";
 
@@ -18,7 +18,7 @@ export function generateMnemonics(){
     return mnemonics
 }
 
-export function createBitcoinWallet(password,mnemonics){
+export async function createBitcoinWallet(password,mnemonics){
     //generate mnemonics
     let seed = mnemonicToSeedSync(mnemonics)
     let root = bip32.fromSeed(seed,testnet)
@@ -29,7 +29,7 @@ export function createBitcoinWallet(password,mnemonics){
     saveStorageItem('CHAIN_CODE',child.chainCode.toString('hex'))
 
     // p2wpkh address
-    const {address} = payments.p2wpkh({pubkey:child.publicKey,network:testnet})
+    const {address} = await payments.p2wpkh({pubkey:child.publicKey,network:testnet})
     saveStorageItem('BTC_ADDR',address)
 
     return address
@@ -43,20 +43,25 @@ export function createEthreumWallet(password,mnemonics){
 }
 
 export function importPrivateKey(privateKey){
+    let key = privateKey
+    if(privateKey.startsWith('0x')){
+        key = privateKey.slice(2)
+    }
     //generate mnemonics
     let seed = mnemonicToSeedSync(generateMnemonic())
     let root = bip32.fromSeed(seed,testnet)
     let chainCode = root.chainCode
-    let bip32Factory = bip32.fromPrivateKey(Buffer.from(privateKey.slice(2),'hex'),chainCode,testnet)
+    let bip32Factory = bip32.fromPrivateKey(Buffer.from(key,'hex'),chainCode,testnet)
+    saveStorageItem('CHAIN_CODE',chainCode.toString('hex'))
 
     bip32Factory.derivePath("m/0'/0'/0'")
 
     // p2wpkh address
     const {address} = payments.p2wpkh({pubkey:bip32Factory.publicKey,network:testnet})
     saveStorageItem('BTC_ADDR',address)
-    savePrivateKey(privateKey)
+    savePrivateKey('0x'+key)
 
-    let etherWallet = new ethers.Wallet(privateKey)
+    let etherWallet = new ethers.Wallet('0x'+key)
     saveStorageItem('ETH_ADDR',etherWallet.address)
     return address
 }
@@ -71,33 +76,6 @@ export async function savePrivateKey(privateKey){
     }
     keysArr.push(privateKey)
     saveStorageItem('KEYS_ARR',keysArr)
-    // let keyPair = await window.crypto.subtle.generateKey(
-    //     {
-    //         name: "RSA-OAEP",
-    //         modulusLength: 2048,
-    //         publicExponent: new Uint8Array([1, 0, 1]),
-    //         hash: "SHA-256",
-    //     },
-    //     true,
-    //     ["encrypt", "decrypt"]
-    // )
-    //
-    // const encoder = new TextEncoder();
-    // const data = encoder.encode(privateKey);
-    //
-    // // 生成一个随机的初始化向量
-    // const iv = window.crypto.getRandomValues(new Uint8Array(12));
-    //
-    // // 使用公钥加密，私钥解密
-    // let encryptedData = await window.crypto.subtle.encrypt(
-    //     {
-    //         name: "AES-GCM",
-    //         iv: iv,
-    //     },
-    //     keyPair.publicKey,
-    //     data
-    // )
-    // console.log('encrypt',encryptedData)
 }
 
 export async function getPrivateKey(){
@@ -165,6 +143,61 @@ export function switchWalletToIndex(index){
             // p2wpkh address
             const {address} = payments.p2wpkh({pubkey:bip32Factory.publicKey,network:testnet})
             saveStorageItem('BTC_ADDR',address)
+        }
+    })
+}
+
+export function checkWalletExistsByMnemonics(mnemonics){
+    return new Promise((resolve, reject)=>{
+        let wallet = ethers.HDNodeWallet.fromMnemonic(ethers.Mnemonic.fromPhrase(mnemonics),'m/0\'/0\'/0\'')
+        let priviteKey = wallet.privateKey
+        getStorageItem('KEYS_ARR').then(keyStr=>{
+            if(keyStr == undefined || keyStr.length == 0){
+                resolve(false)
+            }else{
+                let keys = keyStr.split(" ")
+                if(keys.indexOf(priviteKey) == -1){
+                    resolve(false)
+                }else{
+                    resolve(true)
+                }
+            }
+        }).catch(e=>{
+            reject(e)
+        })
+    })
+}
+
+export function getPublicKeyAndSig(code){
+    return new Promise( async (resolve, reject)=>{
+        try{
+            let prkey = await getPrivateKey()
+            let privateKey = prkey.slice(2)
+
+            let root = bip32.fromSeed(Buffer.from(privateKey,'hex'),testnet)
+            const path = "m/0'/0'/0'";
+            const child = root.derivePath(path);
+
+            let keyPair = bip32.fromPrivateKey(Buffer.from(privateKey,'hex'),child.chainCode)
+
+            let publicKey = keyPair.publicKey.toString('hex')
+            let timestamp = Date.now()*(10**6)
+            let salt = code
+
+            let sigStr = `${publicKey}${salt}${timestamp}`
+            console.log('sign str',sigStr)
+            let msgHash = keccak256(sigStr)
+            console.log('msgHash',msgHash.toString('hex'))
+            let signature = keyPair.sign(Buffer.from(msgHash,'hex'))
+
+            resolve({
+                public_key:publicKey,
+                code:code,
+                timestamp:timestamp,
+                signature:signature.toString('hex')
+            })
+        }catch (e) {
+            reject(e)
         }
     })
 }

@@ -4,7 +4,9 @@ import {useEffect, useState} from "react";
 import {getBitcoinTestnetBalance, getZkbtcHoleskyBalance} from "../utils/blockcypher.jsx";
 import {getStorageItem} from "../utils/utils.jsx";
 import {useLocation} from "react-router-dom";
-import {message, Spin} from "antd";
+import {Spin} from "antd";
+import {getPublicKeyAndSig} from "../utils/create.jsx";
+import {convertToCenterEplis} from "../utils/utils.jsx";
 
 function ConnectRequest(){
     let [btcAddress,setBtcAddress] = useState('')
@@ -13,12 +15,18 @@ function ConnectRequest(){
     let [ethBalance,setEthBalance] = useState(0)
     let [requestUrl,setRequestUrl] = useState('')
     let [submit, setSubmit] = useState(0)
+    let [signatureInfo,setSignatureInfo] = useState({})
+    let [code,setCode] = useState('')
 
     let location = useLocation()
     let params = location.state || {}
+    // if(params && params.url){
+    //     params.url = params.url.split('/#/')[0]
+    // }
 
     useEffect(() => {
         setRequestUrl(params.url)
+        setCode(params.code || '')
 
         getStorageItem('BTC_ADDR').then(btcAddr=>{
             setBtcAddress(btcAddr)
@@ -31,10 +39,20 @@ function ConnectRequest(){
         getBitcoinTestnetBalance(resp=>{
             let bl = resp
             setBtcBalance(bl)
-            chrome.tabs.query({url: `${requestUrl}/*`}, function(tabs) {
+
+            let pattern = `${params.url}*`
+            if(params.url && params.url.includes('/#/')){
+                let split = params.url.split('/#/')[0]
+                pattern = `${split}/*`
+            }
+
+            chrome.tabs.query({url: pattern}, function(tabs) {
+                console.log('start find',params.url)
                 if(tabs && tabs.length > 0){
                     var currentTab = tabs[0]; // 在这里，tabs数组将只包含当前激活的标签页
+                    console.log('find tab',currentTab)
                     if (currentTab) {
+                        console.log('find url tab',requestUrl,currentTab)
                         chrome.tabs.sendMessage(currentTab.id,{
                             type:'tBTC',
                             balance:bl
@@ -46,7 +64,12 @@ function ConnectRequest(){
 
         getZkbtcHoleskyBalance(resp=>{
             setEthBalance(resp)
-            chrome.tabs.query({url: `${requestUrl}/*`}, function(tabs) {
+            let pattern = `${params.url}*`
+            if(params.url && params.url.includes('/#/')){
+                let split = params.url.split('/#/')[0]
+                pattern = `${split}/*`
+            }
+            chrome.tabs.query({url: pattern}, function(tabs) {
                 if(tabs && tabs.length > 0){
                     var currentTab = tabs[0]; // 在这里，tabs数组将只包含当前激活的标签页
                     if (currentTab) {
@@ -67,25 +90,34 @@ function ConnectRequest(){
 
     function clickConfirm(){
         setSubmit(1)
-        chrome.tabs.query({url: `${requestUrl}/*`}, function(tabs) {
-            if(tabs && tabs.length > 0){
-                var currentTab = tabs[0]; // 在这里，tabs数组将只包含当前激活的标签页
-                if (currentTab) {
-                    console.log('convert message to content',currentTab)
-                    chrome.tabs.sendMessage(currentTab.id,{
-                        type:'connected',
-                        connected_info:{btc_addr:btcAddress,eth_addr:ethAddress,tBTC_balance:btcBalance,zkBTC_balance:ethBalance}
-                    },response=>{
-                        console.log('xxxxx received',response)
+
+        let pattern = `${params.url}*`
+        if(params.url && params.url.includes('/#/')){
+            let split = params.url.split('/#/')[0]
+            pattern = `${split}/*`
+        }
+
+        getPublicKeyAndSig(code).then(sig=>{
+            setSignatureInfo(sig)
+            chrome.tabs.query({url: pattern}, function(tabs) {
+                console.log('find tabs',tabs)
+                if(tabs && tabs.length > 0){
+                    tabs.forEach(tab=>{
+                        chrome.tabs.sendMessage(tab.id,{
+                            type:'connected',
+                            connected_info:{btc_addr:btcAddress,eth_addr:ethAddress,tBTC_balance:btcBalance,zkBTC_balance:ethBalance,signature:sig}
+                        },response=>{
+                            console.log('xxxxx received',response)
+                        })
                     })
                 }
-            }
-        });
+            });
 
-        setTimeout(()=>{
-            setSubmit(0)
-            window.close()
-        },1000)
+            setTimeout(()=>{
+                setSubmit(0)
+                window.close()
+            },1000)
+        })
     }
 
     function clickCancel(){
@@ -123,17 +155,17 @@ function ConnectRequest(){
                             <span className="tips">bitcoin address</span>
                             <div className="divider-line"/>
                             <div className="value-con">
-                                <span className="value">{btcAddress}</span>
+                                <span className="value">{convertToCenterEplis(btcAddress,8)}</span>
                             </div>
-                            <span className="number">{btcBalance/(10**8)} tBTC</span>
+                            <span className="number">{btcBalance} tBTC</span>
                         </div>
                         <div className="item-con">
                             <span className="tips">ethereum address</span>
                             <div className="divider-line"/>
                             <div className="value-con">
-                                <span className="value">{ethAddress}</span>
+                                <span className="value">{convertToCenterEplis(ethAddress,8)}</span>
                             </div>
-                            <span className="number">{ethBalance.toFixed(6)} zkBTC</span>
+                            <span className="number">{ethBalance.toFixed(8)} zkBTC</span>
                         </div>
                     </div>
                     <div className="confirm-btns-con">

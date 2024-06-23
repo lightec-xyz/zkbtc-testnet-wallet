@@ -14,11 +14,11 @@ import ecc from '@bitcoinerlab/secp256k1';
 import {BIP32Factory} from "bip32";
 import {testnet} from "bitcoinjs-lib/src/networks";
 import {Buffer} from 'safe-buffer';
-import {getStorageItem} from "./utils.jsx";
+import {getStorageItem, parseBitcoinTx, saveStorageItem} from "./utils.jsx";
 import error from "eslint-plugin-react/lib/util/error.js";
+import {message} from "antd";
 const bip32 = BIP32Factory(ecc)
 
-const BASE_URL = 'https://api.blockcypher.com/v1/btc/test3'
 const BLOCK_CYPHER_TOKEN = '46ef69aa6c2349bc9a38fb5b6ae6080c'
 
 const NODE_CONFIG = {
@@ -31,9 +31,6 @@ const NODE_CONFIG = {
     }
 };
 
-function url(path){
-    return BASE_URL+path
-}
 export function getBitcoinTestnetBalance(callback){
     getStorageItem('BTC_ADDR').then(btcAddr=>{
         getBalance(btcAddr).then(bal=>{
@@ -83,7 +80,7 @@ export async function getEstimateWeight(amount){
     })
 }
 
-export async function redeem(amount,bitcoinAddress,success,failed){
+export async function redeem(amount,bitcoinAddress,estimateGasUsed,success,failed){
     try{
         let privateKey = await getPrivateKey()
         const wallet = new ethers.Wallet(privateKey)
@@ -104,19 +101,34 @@ export async function redeem(amount,bitcoinAddress,success,failed){
         // let weight = await getEstimateWeight(amount*(10**8))
         // console.log('weight=>',weight)
         let gasPrice = await getBtcTestnetGasprice()
-        await bridgeContract.redeem(Math.round(amount*(10**8)),251*gasPrice,'0x'+lockingScript.toString('hex'))
+        console.log('estimateGasUsed',estimateGasUsed)
+        await bridgeContract.redeem(Math.round(amount*(10**8)),251*gasPrice,'0x'+lockingScript.toString('hex'),{
+            gasLimit:estimateGasUsed*ethers.toBigInt(2)
+        })
         // await tx.wait() //等待交易上链
         success()
-    }catch (e){
-        console.log('redeem error=>',e)
-        failed(e)
+    }catch (error){
+        console.log('redeem error',error)
+        if (ethers.isCallException(error)) {
+            const errorData = error.error.data;
+            const iface = new ethers.Interface(zkBTCBridgeAbi);
+            const parsedError = iface.parseError(errorData);
+            if (parsedError.name === "InsufficientBalance") {
+                const [balance, needed] = parsedError.args;
+                message.open({
+                    type:'error',
+                    content:`Insufficient balance. Available: ${balance}, Required: ${needed}`
+                })
+            }
+        } else if(error.code == 'INSUFFICIENT_FUNDS'){
+            failed(`Insufficient tETH to pay gas fee`)
+        }
     }
 }
 
-export async function submitDepositProof(txid,proofData,callback,failed){
+export async function submitDepositProof(txid,proofData,estimateGasUsed,callback,failed){
     try{
-        let response = await axios.get(`https://api.blockcypher.com/v1/btc/test3/txs/${txid}?limit=50&includeHex=true`)
-        let txRaw = response.data.hex
+        let txRaw = await getBTCTransactionRaw(txid.slice(2))
         console.log('get txRaw=>',txRaw)
 
         let privateKey = await getPrivateKey()
@@ -131,10 +143,25 @@ export async function submitDepositProof(txid,proofData,callback,failed){
         const txRawNew = await bridgeContract.removeWitness('0x'+txRaw);
         console.log('remove witness=>',txRawNew)
 
-        await bridgeContract.deposit(txRawNew,proofData);
+        await bridgeContract.deposit(txRawNew,proofData,{
+            gasLimit:estimateGasUsed*ethers.toBigInt(2)
+        });
         callback(true)
-    }catch (e){
-        failed(e)
+    }catch (error){
+        console.log('submit failed',error.code,error.reason,error)
+        if (ethers.isCallException(error)) {
+            const errorData = error.error.data;
+            const iface = new ethers.Interface(zkBTCBridgeAbi);
+            const parsedError = iface.parseError(errorData);
+            console.log('parsed error=>',parsedError)
+            if (parsedError.name === "UTXOIsExisted") {
+                failed(`The same txid existed`)
+            }else if(parsedError.name === "InvalidDepositAmount"){
+                failed(`The minimum deposit amount is 1000 satoshi`)
+            }
+        }else if(error.code == 'INSUFFICIENT_FUNDS'){
+            failed(`Insufficient tETH to pay gas fee`)
+        }
     }
 }
 
@@ -177,6 +204,7 @@ export async function deposit(amount,ethAddress,success,faild){
 
         // 根据Deposit amount构建input
         let totalCoastAmount = Math.round(amount*(10**8))+251*gasPrice // Deposit amount + estimate miner fee
+        console.log('deposit amount',Math.round(amount*(10**8)),amount)
 
         let appendAmount = 0
         let outputScript = address.toOutputScript(bitcoinAddress,testnet)
@@ -213,7 +241,7 @@ export async function deposit(amount,ethAddress,success,faild){
         // 添加输出
         psbt.addOutput({
             address: SYS_BITCOIN_ADDRESS,
-            value: parseInt(amount*(10**8)),  // 交易金额，以 satoshi 为单位
+            value: Math.round(amount*(10**8)),  // 交易金额，以 satoshi 为单位
         });
 
         psbt.addOutput({
@@ -262,12 +290,13 @@ export async function estimateGasFee(amount,bitcoinAddress,callback){
             return false
         })
     }
+    console.log('utxos',utxos)
 
     var nInput = 0
     var nOutput = 3
 
     // 根据Deposit amount构建input
-    let totalCoastAmount = parseInt(amount*(10**8))+251*gasPrice // Deposit amount + estimate miner fee
+    let totalCoastAmount = Math.round(amount*(10**8))+251*gasPrice // Deposit amount + estimate miner fee
 
     let appendAmount = 0
 
@@ -275,7 +304,7 @@ export async function estimateGasFee(amount,bitcoinAddress,callback){
         if(appendAmount < totalCoastAmount){
             nInput += 1;
             let estimateSize = estimateP2WPKHTransactionSize(nInput,nOutput)
-            totalCoastAmount = estimateSize*gasPrice + amount*(10**8)
+            totalCoastAmount = estimateSize*gasPrice + Math.round(amount*(10**8))
             appendAmount += utxos[i].amount*(10**8)
         }else{
             break
@@ -383,34 +412,51 @@ export function getSystemAvailableZkbtc(){
     })
 }
 
-export async function getUtxoIsSubmitted(txid,callBack){
-    const provider = new ethers.JsonRpcProvider(HOLESKY_NODE);
-    // 创建代币合约实例
-    const utxoContract = new ethers.Contract(UTXO_ADDRESS, UTXOAbi, provider);
-    let result = await utxoContract.utxoOf(txid)
-    callBack(result[3])
+export async function getUtxoIsSubmitted(txid){
+    return new Promise( async (resolve, reject)=>{
+        try{
+            const provider = new ethers.JsonRpcProvider(HOLESKY_NODE);
+            // 创建代币合约实例
+            const utxoContract = new ethers.Contract(UTXO_ADDRESS, UTXOAbi, provider);
+            let result = await utxoContract.utxoOf(txid)
+            resolve(result[3])
+        }catch (e){
+            reject(e)
+        }
+    })
 }
 
 
-export async function getBtcTestnetGasprice(){
-    const data = {
-        jsonrpc: "1.0",
-        id: "curltext",
-        method: "estimatesmartfee",
-        params: [2] // 以2个区块为目标的确认时间
-    };
-
-    return new Promise((resolve, reject) => {
-        axios.post(NODE_RPC, data, NODE_CONFIG)
-            .then(response => {
-                let feeRate = response.data.result.feerate*(10**5)
-                console.log('gas price => ',response,feeRate)
-                let price = Math.ceil(feeRate*1.2)
-                resolve(price)
-            })
-            .catch(error => {
-                reject('fetch gas price failed')
-            });
+// export function getBtcTestnetGasprice(){
+//     const data = {
+//         jsonrpc: "1.0",
+//         id: "curltext",
+//         method: "estimatesmartfee",
+//         params: [6] // 以2个区块为目标的确认时间
+//     };
+//
+//     return new Promise((resolve, reject) => {
+//         axios.post(NODE_RPC, data, NODE_CONFIG)
+//             .then(response => {
+//                 let feeRate = response.data.result.feerate*(10**5)
+//                 console.log('gas price => ',response,feeRate)
+//                 let price = Math.ceil(feeRate*1.2)
+//                 console.log('gas price 1.2 => ',price)
+//                 resolve(price)
+//             })
+//             .catch(error => {
+//                 reject('fetch gas price failed')
+//             });
+//     })
+// }
+export function getBtcTestnetGasprice(){
+    return new Promise(  (resolve, reject)=>{
+        axios.get(`https://blockstream.info/testnet/api/fee-estimates`).then(response=>{
+            console.log('response',response)
+            resolve(Math.ceil(parseFloat(response.data['12'])*1.2))
+        }).catch(e=>{
+            reject(e)
+        })
     })
 }
 
@@ -428,6 +474,26 @@ export function getDescriptor(address){
             console.log('import descriptor failed =>',e)
             reject(e)
         })
+    })
+}
+
+export async function getBTCTransactionRaw(txid){
+    const data = {
+        jsonrpc: "1.0",
+        id: "curltext",
+        method: "gettransaction",
+        params: [txid] // 以2个区块为目标的确认时间
+    };
+
+    return new Promise((resolve, reject) => {
+        axios.post(NODE_RPC, data, NODE_CONFIG)
+            .then(response => {
+                let raw = response.data.result.hex
+                resolve(raw)
+            })
+            .catch(error => {
+                reject('fetch transaction raw failed')
+            });
     })
 }
 
@@ -539,4 +605,203 @@ export async function getHistoryProofStatus(txids){
             reject(error)
         });
     })
+}
+
+export function estimateRedeemEthereumFee(amount,btcAddr){
+    return new Promise( async (resolve, reject)=>{
+        try{
+            let privateKey = await getPrivateKey()
+            const wallet = new ethers.Wallet(privateKey)
+            const provider = new ethers.JsonRpcProvider(HOLESKY_NODE);
+
+            // 连接钱包到提供者
+            const connectedWallet = wallet.connect(provider);
+
+            // 创建代币合约实例
+            const bridgeContract = new ethers.Contract(ZKBTC_BRIDGE_ADDRESS, zkBTCBridgeAbi, connectedWallet);
+
+            // 将 P2WPKH 测试网地址解码为 witness 程序
+            const { version, data } = address.fromBech32(btcAddr);
+
+            const lockingScript = script.compile([version,data])
+            const gasPrice = await provider.send('eth_gasPrice', []);
+
+            let gasEstimate = await bridgeContract.redeem.estimateGas(Math.round(amount*(10**8)),3000,lockingScript);
+            console.log('获取eth gas',gasEstimate,gasPrice)
+            let cost = ethers.toBigInt(gasPrice)*gasEstimate
+            console.log('总gas',cost)
+            resolve(resolve({
+                cost:ethers.formatEther(cost),
+                estimateGas:gasEstimate,
+                gasPrice:ethers.toBigInt(gasPrice)
+            }))
+        }catch (e){
+            reject(e)
+        }
+    })
+}
+
+export function estimateSubmmitProofGas(transactionId,proofData){
+    return new Promise( async (resolve, reject)=>{
+        try{
+            let txRaw = await getBTCTransactionRaw(transactionId.slice(2))
+            console.log('get txRaw=>',txRaw)
+
+            let privateKey = await getPrivateKey()
+            const wallet = new ethers.Wallet(privateKey)
+            const provider = new ethers.JsonRpcProvider(HOLESKY_NODE);
+
+            // 连接钱包到提供者
+            const connectedWallet = wallet.connect(provider);
+
+            // 创建代币合约实例
+            const bridgeContract = new ethers.Contract(ZKBTC_BRIDGE_ADDRESS, zkBTCBridgeAbi, connectedWallet);
+            const gasPrice = await provider.send('eth_gasPrice', []);
+
+            const txRawNew = await bridgeContract.removeWitness('0x'+txRaw);
+            console.log('remove witness=>',txRawNew)
+
+            let gasEstimate = await bridgeContract.deposit.estimateGas(txRawNew,proofData);
+            console.log('获取eth gas',gasEstimate,gasPrice)
+            let cost = ethers.toBigInt(gasPrice)*gasEstimate*ethers.toBigInt(2)
+            console.log('总gas',cost)
+            resolve({
+                cost:ethers.formatEther(cost),
+                estimateGas:gasEstimate,
+                gasPrice:ethers.toBigInt(gasPrice)
+            })
+        }catch (e){
+            reject(e)
+        }
+    })
+}
+
+export async function getRedeemHistory(ethAddress){
+    return new Promise( async (resolve, reject)=>{
+        if(ethAddress == undefined || !ethers.isAddress(ethAddress)){
+            resolve([])
+        }else{
+            let params = {
+                jsonrpc: '2.0',
+                method: 'zkbtc_txesByAddr',
+                params: [ethAddress,'redeem'], // 假设我们请求用户ID为1的用户名
+                id: 1,
+            }
+            await axios.post(PROOF_HOST, params).then(response=>{
+                console.log('getRedeemHistory',response)
+                let list = response.data.result
+                resolve(list.reverse())
+            }).catch(error=>{
+                console.log('请求出错=>',error)
+                reject(error)
+            });
+        }
+    })
+}
+
+export function getBitcoinTransaction(txid){
+    return new Promise((resolve, reject)=>{
+        // const data = {
+        //     jsonrpc: "1.0",
+        //     id: "curltext",
+        //     method: "gettransaction",
+        //     params: [txid.slice(2)] //获取所有已确认的余额
+        // };
+        // axios.post(NODE_RPC+'/wallet/mytest', data, NODE_CONFIG)
+        //     .then(response => {
+        //         let tx = response.data.result
+        //         resolve(tx)
+        //     })
+        //     .catch(error => {
+        //         reject('gettransaction failed',error)
+        //     });
+        axios.get(`https://blockstream.info/testnet/api/tx/${txid.slice(2)}/status`).then(response=>{
+            console.log('response',response)
+            let tx = response.data
+            resolve(tx)
+        }).catch(error=>{
+            console.log('请求出错=>',error)
+            reject(error)
+        });
+    })
+}
+
+export async function loadUncompleteRedeemTransactions(ethAddr){
+    return new Promise((resolve, reject)=>{
+        getRedeemHistory(ethAddr).then(async list=>{
+            let uncomplete = []
+            if(ethAddr == undefined || ethAddr.length == 0 || !ethers.isAddress(ethAddr)){
+                console.log('invalid eth addr',ethAddr)
+                reject('invalid eth addr')
+            }
+            console.log("redeem history",list)
+            let jsonStr = await getStorageItem('REDEEM_DONE') || "{}"
+            let savedS = JSON.parse(jsonStr)
+            for(var i=0;i<list.length;i++){
+                if(list[i].destChain.hash == "" || list[i].destChain.hash == undefined){
+                    uncomplete.push(list[i])
+                }else{
+                    if(savedS[list[i].hash] == true){
+                        continue
+                    }
+                    let tx = await getBitcoinTransaction(list[i].destChain.hash)
+                    console.log('tx =>',tx)
+                    if(tx.confirmed){
+                        savedS[list[i].hash] = true
+                        continue
+                    }else{
+                        list[i]['confirmed'] = false
+                        savedS[list[i].hash] = false
+                        uncomplete.push(list[i])
+                    }
+                }
+            }
+            saveStorageItem('REDEEM_DONE',JSON.stringify(savedS))
+            console.log('uncompletes count',uncomplete)
+            resolve(uncomplete)
+        }).catch(e=>{
+            reject(e)
+        })
+    })
+}
+
+export async function getDepositAllUncompletes(btcAddr){
+    return new Promise( async (resolve, reject)=>{
+        if(btcAddr == undefined || btcAddr.length == 0){
+            reject('btc invalid')
+        }
+        let deposits = await getBitcoinAddressTransactions(btcAddr)
+        console.log('获取所有deposits',deposits)
+        let uncomplete = await getUncompleteDeposit(deposits,btcAddr)
+        resolve(uncomplete)
+    })
+}
+
+export async function getUncompleteDeposit(deposits,btcAddr){
+    let uncompleted = []
+    let jsonStr = await getStorageItem('DEPOSIT_DONE') || "{}"
+    let savedS = JSON.parse(jsonStr)
+    for(var i=0;i<deposits.length;i++){
+        let parse = parseBitcoinTx(deposits[i],btcAddr)
+        if(parse.type != 2){ //非deposit交易过滤
+            continue
+        }
+        if(deposits[i].status.confirmed == false){
+            uncompleted.push(deposits[i])
+        }else{
+            if(savedS[deposits[i].txid] == true){
+                continue
+            }
+            let submitted = await getUtxoIsSubmitted('0x'+deposits[i].txid)
+            if(submitted == false){
+                savedS[deposits[i].txid] = false
+                deposits[i].progress = 1
+                uncompleted.push(deposits[i])
+            }else{
+                savedS[deposits[i].txid] = true
+            }
+        }
+    }
+    saveStorageItem('DEPOSIT_DONE',JSON.stringify(savedS))
+    return uncompleted
 }
