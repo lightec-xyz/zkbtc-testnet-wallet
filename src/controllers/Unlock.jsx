@@ -22,8 +22,10 @@ function Unlock(){
 
     useEffect(  () => {
         // 获取当前页面 URL 的查询参数
-        const searchParams = new URLSearchParams(window.location.search);
-        console.log('searchParams',searchParams)
+        const URLi = new URL(window.location.href);
+        let searchParams = URLi.searchParams
+
+        console.log('window.location',window.location.href,searchParams)
 
         // 获取特定参数的值
         let typeParam = searchParams.get('type')

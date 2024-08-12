@@ -15,7 +15,6 @@ import {BIP32Factory} from "bip32";
 import {testnet} from "bitcoinjs-lib/src/networks";
 import {Buffer} from 'safe-buffer';
 import {getStorageItem, parseBitcoinTx, saveStorageItem} from "./utils.jsx";
-import error from "eslint-plugin-react/lib/util/error.js";
 import {message} from "antd";
 const bip32 = BIP32Factory(ecc)
 
@@ -92,10 +91,7 @@ export async function redeem(amount,bitcoinAddress,estimateGasUsed,success,faile
         // 创建代币合约实例
         const bridgeContract = new ethers.Contract(ZKBTC_BRIDGE_ADDRESS, zkBTCBridgeAbi, connectedWallet);
 
-        // 将 P2WPKH 测试网地址解码为 witness 程序
-        const { version, data } = address.fromBech32(bitcoinAddress);
-
-        const lockingScript = script.compile([version,data])
+        const lockingScript = address.toOutputScript(bitcoinAddress,testnet)
         console.log('witness script => ',lockingScript.toString('hex'))
 
         // let weight = await getEstimateWeight(amount*(10**8))
@@ -167,11 +163,7 @@ export async function submitDepositProof(txid,proofData,estimateGasUsed,callback
 
 export function isBitcoinAddress(bitcoinAddress){
     try {
-        // 将 P2WPKH 测试网地址解码为 witness 程序
-        const { version, data } = address.fromBech32(bitcoinAddress);
-
-        const lockingScript = script.compile([version,data])
-        console.log('witness script => ',lockingScript)
+        address.toOutputScript(bitcoinAddress,testnet)
         return true
     }catch (e) {
         console.log('check bitcoin address error',e)
@@ -620,12 +612,10 @@ export function estimateRedeemEthereumFee(amount,btcAddr){
             // 创建代币合约实例
             const bridgeContract = new ethers.Contract(ZKBTC_BRIDGE_ADDRESS, zkBTCBridgeAbi, connectedWallet);
 
-            // 将 P2WPKH 测试网地址解码为 witness 程序
-            const { version, data } = address.fromBech32(btcAddr);
-
-            const lockingScript = script.compile([version,data])
+            const lockingScript = address.toOutputScript(btcAddr,testnet)
             const gasPrice = await provider.send('eth_gasPrice', []);
 
+            console.log('estimate gas amount=>',amount)
             let gasEstimate = await bridgeContract.redeem.estimateGas(Math.round(amount*(10**8)),3000,lockingScript);
             console.log('获取eth gas',gasEstimate,gasPrice)
             let cost = ethers.toBigInt(gasPrice)*gasEstimate
@@ -636,6 +626,7 @@ export function estimateRedeemEthereumFee(amount,btcAddr){
                 gasPrice:ethers.toBigInt(gasPrice)
             }))
         }catch (e){
+            console.log('estimate error',e)
             reject(e)
         }
     })

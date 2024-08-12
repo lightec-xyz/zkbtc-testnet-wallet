@@ -16,14 +16,16 @@
     align-items: center;
     padding-left: 10px;
     .icon{
-      width: 33px;
+      width: 46px;
       height: 33px;
+      margin-left: 8px;
     }
     .name{
       font-size: 18px;
       color: white;
       font-family: Tomorrow;
       font-weight: 600;
+      margin-left: 10px;
     }
   }
   .connect-con{
@@ -68,9 +70,8 @@
           flex-direction: row;
           align-items: center;
           .val-icon{
-            width: 33px;
+            width: 46px;
             height: 33px;
-            margin-left: -5px;
           }
           .value{
             color: #2051F4;
